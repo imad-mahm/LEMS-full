@@ -5,8 +5,9 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSION['user']['mail'], "lau.edu.lb")){ 
-    echo "<script>alert('You are not authorized to access this page.');</script>";
-    echo $_SESSION['user']['mail'];
+    session_destroy();
+    $error_message = urlencode("You are not authorized to access this page.");
+    header("Location: index.html?error=" . $error_message);
     exit;
   } 
 ?>

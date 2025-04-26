@@ -62,7 +62,7 @@ if ($conn->connect_error) {
 
 // Check if user exists in the database
 $stmt = $conn->prepare("SELECT * FROM user WHERE LAU_email = ?");
-$stmt->bind_param("s", $_SESSION['user']['email']);
+$stmt->bind_param("s", $_SESSION['user']['mail']);
 $stmt->execute();
 $result = $stmt->get_result();
 if($result->num_rows > 0) {
@@ -76,7 +76,7 @@ if($result->num_rows > 0) {
     $stmt->bind_param("ssss", $_SESSION['user']['mail'], $first_name, $last_name, $_SESSION['user']['mail']);
     $stmt->execute();
 } else {
-// User does not exist, insert into database
+    // User does not exist, insert into database
     $stmt = $conn->prepare("INSERT INTO user (LAU_EMAIL, USER_ROLE, FIRST_NAME, LAST_NAME) VALUES (?, 'user', ?, ?)");
     //split display name into first and last name
     $display_name = $_SESSION['user']['displayName'];
