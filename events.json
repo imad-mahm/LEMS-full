@@ -1,0 +1,92 @@
+[
+    {
+      "event": "Environmental Science Field Trip",
+      "date": "Tuesday, June 10, 2025",
+      "time": "09:00",
+      "location": "University Main Gate (Meeting Point)",
+      "tags": "Environmental Science",
+      "spots_filled": 15,
+      "spots_total": 20
+    },
+    {
+      "event": "Intro to Robotics Workshop",
+      "date": "Wednesday, April 30, 2025",
+      "time": "14:00",
+      "location": "Engineering Building - Lab 2",
+      "tags": "Engineering",
+      "spots_filled": 12,
+      "spots_total": 20
+    },
+    {
+      "event": "Career Talk: Life After Graduation",
+      "date": "Monday, May 5, 2025",
+      "time": "11:00",
+      "location": "Business Auditorium",
+      "tags": "Career Development",
+      "spots_filled": 25,
+      "spots_total": 30
+    },
+    {
+      "event": "AI and Ethics Panel Discussion",
+      "date": "Friday, May 16, 2025",
+      "time": "16:00",
+      "location": "Main Campus Hall",
+      "tags": "Artificial Intelligence",
+      "spots_filled": 18,
+      "spots_total": 25
+    },
+    {
+      "event": "Photography Basics Workshop",
+      "date": "Saturday, June 1, 2025",
+      "time": "10:00",
+      "location": "Art Studio - Room 5",
+      "tags": "Arts & Media",
+      "spots_filled": 10,
+      "spots_total": 15
+    },
+    {
+      "event": "Hackathon 2025",
+      "date": "Friday, May 23, 2025",
+      "time": "09:00",
+      "location": "Innovation Hub",
+      "tags": "Tech & Innovation",
+      "spots_filled": 40,
+      "spots_total": 50
+    },
+    {
+      "event": "Business Pitch Competition",
+      "date": "Thursday, May 29, 2025",
+      "time": "13:00",
+      "location": "Room B101",
+      "tags": "Business",
+      "spots_filled": 16,
+      "spots_total": 20
+    },
+    {
+      "event": "Sustainable Cities Lecture",
+      "date": "Tuesday, June 3, 2025",
+      "time": "15:00",
+      "location": "Green Hall",
+      "tags": "Sustainability",
+      "spots_filled": 8,
+      "spots_total": 25
+    },
+    {
+      "event": "Python for Data Analysis",
+      "date": "Monday, May 19, 2025",
+      "time": "10:00",
+      "location": "CompSci Lab 3",
+      "tags": "Programming",
+      "spots_filled": 20,
+      "spots_total": 20
+    },
+    {
+      "event": "Music Jam Session",
+      "date": "Friday, June 7, 2025",
+      "time": "17:30",
+      "location": "Music Room A",
+      "tags": "Performing Arts",
+      "spots_filled": 7,
+      "spots_total": 15
+    }
+  ]

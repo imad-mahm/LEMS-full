@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LEMS Login</title>
+    <link rel="stylesheet" href="login.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="glass-card">
+        <div class="logo">
+          <span class="logo-text">LEMS</span>
+          <img src="logo.png" alt="LEMS Logo" />
+        </div>
+        <p class="tagline">The gateway to all LAU events</p>
+        <button class="sign-in-btn" onclick="window.location.href='login.php'">
+          Login with outlook
+        </button>
+        <!-- we need to check url cariable (index.html?error=unauthorized) -->
+        <div
+          class="error-message"
+          id="error-message"
+          style="display: none; color: red"
+        >
+          <p>Unauthorized access. Please log in with LAU Email.</p>
+        </div>
+        <script>
+          // Check if the URL contains the error parameter
+          const urlParams = new URLSearchParams(window.location.search);
+          const error = urlParams.get("error");
+          if (error) {
+            document.getElementById("error-message").style.display = "block";
+          }
+        </script>
+        <p class="footer">©2025 404 GROUP NOT FOUND</p>
+      </div>
+    </div>
+  </body>
+</html>

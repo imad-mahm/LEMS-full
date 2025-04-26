@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recommended | LEMS</title>
+    <link rel="stylesheet" href="recommended.css" />
+    <script type="module">
+      import { faker } from "https://esm.sh/@faker-js/faker";
+
+      fetch("events.json")
+        .then((response) => response.json())
+        .then((events) => {
+          const eventList = document.querySelector(".event-grid");
+          eventList.innerHTML = "";
+
+          events.forEach((event) => {
+            const eventCard = document.createElement("div");
+            eventCard.classList.add("event-card");
+
+            const image = faker.image.url();
+
+            const filled = event.spots_filled || 0;
+            const total = event.spots_total || 20;
+            const percentFilled = Math.min((filled / total) * 100, 100);
+
+            eventCard.innerHTML = `
+      <div class="event-card" onclick="window.location.href='event.html?event=${
+        event.event
+      }&image=${image}'">
+          <div class="event-image">
+            <span class="category-tag">${event.tags || "General"}</span>
+            <img src="${image}" alt="${event.event} image" />
+          </div>
+          <div class="event-content">
+            <h3>${event.event}</h3>
+            <div class="event-detail">
+              <span class="icon">📅</span>
+              <span>${event.date}</span>
+            </div>
+            <div class="event-detail">
+              <span class="icon">⏰</span>
+              <span>${event.time || "TBA"}</span>
+            </div>
+            <div class="event-detail">
+              <span class="icon">📍</span>
+              <span>${event.location}</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width: ${percentFilled}%;"></div>
+            </div>
+            <p class="spots-filled">${filled} / ${total} spots filled</p>
+            <button class="btn-reserve">Reserve In Person</button>
+          </div>
+        </div>
+      `;
+            eventList.appendChild(eventCard);
+          });
+
+          eventList.classList.remove("empty");
+        })
+        .catch((error) => {
+          console.error("Error loading events:", error);
+        });
+    </script>
+  </head>
+  <body>
+    <header class="navbar">
+      <a class="logo" href="home.html" style="text-decoration: none">
+        <img src="logo.png" alt="LEMS Logo" />
+        <span>LEMS</span>
+      </a>
+      <nav class="nav-links">
+        <a href="browse.html">Browse Events</a>
+        <a href="Recommended.html">Recommended</a>
+
+        <div class="profile-dropdown">
+          <img
+            src="https://img.icons8.com/ios-filled/24/ffffff/user.png"
+            alt="User Icon"
+            class="profile-icon"
+            onclick="toggleDropdown()"
+          />
+          <div id="dropdown-menu" class="dropdown-menu">
+            <a href="profile.html" class="dropdown-item profile-link"
+              >Profile</a
+            >
+            <a
+              href="index.html"
+              class="dropdown-item logout-link"
+              style="color: red"
+              >Log Out</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="container">
+      <h1>Recommended Events</h1>
+      <p class="subtext">
+        Personalized event suggestions based on your academic interests
+      </p>
+      <div id="upload-card" class="card">
+        <h2>Academic Profile</h2>
+        <p>
+          Upload and manage your transcript for personalized recommendations
+        </p>
+        <div class="custom-file">
+          <label for="transcript" class="file-box">
+            <img
+              src="https://img.icons8.com/ios-filled/24/065f46/file--v1.png"
+              alt="File Icon"
+              class="file-icon"
+            />
+            <span id="file-label">Choose a PDF file</span>
+          </label>
+          <input type="file" id="transcript" accept=".pdf" />
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-success" onclick="showRecommendations()">
+            Upload Transcript
+          </button>
+        </div>
+      </div>
+      <section id="recommendations" style="display: none">
+        <h2 style="padding: 0 2rem">
+          Recommended Events Based on Your Transcript
+        </h2>
+        <div class="event-grid"></div>
+      </section>
+    </main>
+    <footer class="footer">
+      <p>© 2025 LEMS. All rights reserved.</p>
+    </footer>
+
+    <script>
+      function toggleDropdown() {
+        const menu = document.getElementById("dropdown-menu");
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+      }
+
+      window.onclick = function (e) {
+        if (!e.target.matches(".profile-icon")) {
+          const menu = document.getElementById("dropdown-menu");
+          if (menu && menu.style.display === "block") {
+            menu.style.display = "none";
+          }
+        }
+      };
+      function showRecommendations() {
+        if (transcriptInput.files.length > 0) {
+          document.getElementById("upload-card").style.display = "none";
+          document.getElementById("recommendations").style.display = "block";
+        } else {
+          alert("Please upload a transcript PDF first.");
+        }
+      }
+      const transcriptInput = document.getElementById("transcript");
+      const fileLabel = document.getElementById("file-label");
+
+      transcriptInput.addEventListener("change", () => {
+        if (transcriptInput.files.length > 0) {
+          fileLabel.textContent = transcriptInput.files[0].name;
+        } else {
+          fileLabel.textContent = "Choose a PDF file";
+        }
+      });
+    </script>
+  </body>
+</html>

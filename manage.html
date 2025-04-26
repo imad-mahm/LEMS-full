@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Your Profile | LEMS</title>
+    <link rel="stylesheet" href="manage.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <a class="logo" href="home.html" style="text-decoration: none">
+        <img src="logo.png" alt="LEMS Logo" />
+        <span>LEMS</span>
+      </a>
+      <nav class="nav-links">
+        <a href="browse.html">Browse Events</a>
+        <a href="Recommended.html">Recommended</a>
+
+        <div class="profile-dropdown">
+          <img
+            src="https://img.icons8.com/ios-filled/24/ffffff/user.png"
+            alt="User Icon"
+            class="profile-icon"
+            onclick="toggleDropdown()"
+          />
+          <div id="dropdown-menu" class="dropdown-menu">
+            <a href="profile.html" class="dropdown-item profile-link"
+              >Profile</a
+            >
+            <a
+              href="index.html"
+              class="dropdown-item logout-link"
+              style="color: red"
+              >Log Out</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container">
+      <h1>My Events</h1>
+      <p class="subtext">
+        Manage your event reservations and view your event history
+      </p>
+
+      <div class="tab-container">
+        <button class="tab active" onclick="toggleTab(this)">
+          Upcoming Events (0)
+        </button>
+        <button class="tab" onclick="toggleTab(this)">Past Events (0)</button>
+      </div>
+
+      <div class="event-empty">
+        <div class="icon">📅</div>
+        <h2>No upcoming events</h2>
+        <p>You haven't reserved any upcoming events yet</p>
+        <a href="browse.html" class="btn-primary">Browse Events</a>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>© 2025 LEMS. All rights reserved.</p>
+    </footer>
+    <script>
+      function toggleDropdown() {
+        const menu = document.getElementById("dropdown-menu");
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+      }
+
+      window.onclick = function (e) {
+        if (!e.target.matches(".profile-icon")) {
+          const menu = document.getElementById("dropdown-menu");
+          if (menu && menu.style.display === "block") {
+            menu.style.display = "none";
+          }
+        }
+      };
+
+      function toggleTab(selected) {
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach((tab) => tab.classList.remove("active"));
+        selected.classList.add("active");
+      }
+    </script>
+  </body>
+</html>

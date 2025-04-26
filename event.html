@@ -1,0 +1,114 @@
+<!-- event.html is redirected from browse with "event.html?event=[eventName]" -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Details | LEMS</title>
+    <link rel="stylesheet" href="event.css" />
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const eventName = urlParams.get("event");
+      const image = urlParams.get("image");
+
+      fetch("events.json")
+        .then((response) => response.json())
+        .then((events) => {
+          const event = events.find((e) => e.event === eventName);
+          if (event) {
+            document.querySelector(".event-image").src = image;
+            document.querySelector(".event-image").alt = `${event.event} image`;
+            document.querySelector(".event-title").textContent = event.event;
+            document.querySelector(".event-date").textContent = event.date;
+            document.querySelector(".event-time").textContent =
+              event.time || "TBA";
+            document.querySelector(".event-location").textContent =
+              event.location;
+            document.querySelector(".event-tags").textContent =
+              event.tags || "General";
+            const filled = event.spots_filled || 0;
+            const total = event.spots_total || 20;
+            const percentFilled = Math.min((filled / total) * 100, 100);
+            document.querySelector(
+              ".progress-bar .progress"
+            ).style.width = `${percentFilled}%`;
+            document.querySelector(
+              ".spots-filled"
+            ).textContent = `${filled} / ${total} spots filled`;
+          } else {
+            console.error("Event not found");
+          }
+        })
+        .catch((error) => console.error("Error fetching events:", error));
+    </script>
+  </head>
+  <body>
+    <header class="navbar">
+      <a class="logo" href="home.html" style="text-decoration: none">
+        <img src="logo.png" alt="LEMS Logo" />
+        <span>LEMS</span>
+      </a>
+      <nav class="nav-links">
+        <a href="browse.html">Browse Events</a>
+        <a href="Recommended.html">Recommended</a>
+
+        <div class="profile-dropdown">
+          <img
+            src="https://img.icons8.com/ios-filled/24/ffffff/user.png"
+            alt="User Icon"
+            class="profile-icon"
+            onclick="toggleDropdown()"
+          />
+          <div id="dropdown-menu" class="dropdown-menu">
+            <a href="profile.html" class="dropdown-item profile-link"
+              >Profile</a
+            >
+            <a
+              href="index.html"
+              class="dropdown-item logout-link"
+              style="color: red"
+              >Log Out</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container">
+      <img src="" alt="" class="event-image" />
+      <h1 class="event-title"></h1>
+      <p class="event-date"></p>
+      <p class="event-time"></p>
+      <p class="event-location"></p>
+      <p class="event-tags"></p>
+
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+      <p class="spots-filled"></p>
+
+      <button class="btn-reserve">Reserve In Person</button>
+    </main>
+
+    <footer class="footer">
+      <p>© 2025 LEMS. All rights reserved.</p>
+    </footer>
+    <script>
+      function toggleDropdown() {
+        const menu = document.getElementById("dropdown-menu");
+        menu.classList.toggle("show");
+      }
+      window.onclick = function (event) {
+        if (!event.target.matches(".profile-icon")) {
+          const dropdowns = document.getElementsByClassName("dropdown-menu");
+          for (let i = 0; i < dropdowns.length; i++) {
+            const openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains("show")) {
+              openDropdown.classList.remove("show");
+            }
+          }
+        }
+      };
+    </script>
+  </body>
+</html>
