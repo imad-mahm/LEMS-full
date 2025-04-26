@@ -70,7 +70,7 @@ if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSIO
     <section class="hero">
       <h1>Welcome to LEMS,
         <?php
-          echo "Welcome, " . htmlspecialchars($_SESSION['user']['mail']);
+          echo "Welcome, " . htmlspecialchars($_SESSION['user']['displayName']);
         ?>
       </h1>
       <p>

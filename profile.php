@@ -1,3 +1,12 @@
+<?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header('Location: index.html');
+    exit();
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -45,12 +54,43 @@
         <section class="left-panel">
           <div class="card">
             <h2>Account Information</h2>
+            <?php
+            // Database connection
+            $conn = new mysqli('localhost', 'root', '', 'lems');
+
+            // Check connection
+            if ($conn->connect_error) {
+              die("Connection failed: " . $conn->connect_error);
+            }
+
+            // Fetch user data
+            $user_mail = $_SESSION['user']['mail'];
+            $sql = "SELECT first_name, last_name, lau_email, user_role FROM user WHERE lau_email = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $user_mail);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+              $user = $result->fetch_assoc();
+              $first_name = htmlspecialchars($user['first_name']);
+              $last_name = htmlspecialchars($user['last_name']);
+              $email = htmlspecialchars($user['lau_email']);
+              $role = htmlspecialchars($user['user_role']);
+            } else {
+              $first_name = $last_name = $email = $role = "Unknown";
+            }
+
+            $stmt->close();
+            $conn->close();
+            ?>
+
             <div class="account-header">
-              <div class="avatar">UN</div>
+              <div class="avatar"><?php echo strtoupper(substr($first_name, 0, 1) . substr($last_name, 0, 1)); ?></div>
               <div class="info">
-                <p class="name">First Last</p>
-                <p class="email">email.name@lau.edu</p>
-                <span class="role">STUDENT</span>
+              <p class="name"><?php echo $first_name . ' ' . $last_name; ?></p>
+              <p class="email"><?php echo $email; ?></p>
+              <span class="role"><?php echo strtoupper($role); ?></span>
               </div>
             </div>
 
