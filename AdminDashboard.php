@@ -24,7 +24,7 @@ $sql = "SELECT E.*, GROUP_CONCAT(C.CLUB_NAME SEPARATOR ', ') AS CLUB_NAMES
     FROM `event` AS E
     LEFT JOIN `event_club` AS EC ON E.EVENTID = EC.EVENTID
     LEFT JOIN `club` AS C ON EC.CLUBID = C.ID
-    WHERE E.STATE IN ('pending', 'approved', 'completed')
+    WHERE E.STATE IN ('pending', 'approved', 'completed','cancelled')
     GROUP BY E.EVENTID
     ORDER BY E.START_TIME ASC";
 
