@@ -43,6 +43,7 @@ $events = $result->fetch_all(MYSQLI_ASSOC);
         <title>Create Event | LEMS</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM8d7j3z5l5e5c5e5e5e5e5e5e5e5e5e5e5e5" crossorigin="anonymous" />
         <link rel="stylesheet" href="browse.css" />
+        <link rel="stylesheet" href="home.css" />
     </head>
     <body>
     <script>
@@ -67,12 +68,12 @@ $events = $result->fetch_all(MYSQLI_ASSOC);
 </script>
 
     <header class="navbar">
-      <a class="logo" href="home.html" style="text-decoration: none">
+      <a class="logo" href="home.php" style="text-decoration: none">
         <img src="logo.png" alt="LEMS Logo" />
         <span>LEMS</span>
       </a>
       <nav class="nav-links">
-        <a href="browse.html">Browse Events</a>
+        <a href="browse.php">Browse Events</a>
         <a href="Recommended.html">Recommended</a>
         <?php
          //look for user in database
@@ -103,7 +104,7 @@ $events = $result->fetch_all(MYSQLI_ASSOC);
             onclick="toggleDropdown()"
           />
           <div id="dropdown-menu" class="dropdown-menu">
-            <a href="profile.html" class="dropdown-item profile-link"
+            <a href="profile.php" class="dropdown-item profile-link"
               >Profile</a
             >
             <a

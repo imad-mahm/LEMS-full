@@ -95,7 +95,7 @@ if (!isset($_SESSION['user'])) {
             </div>
 
             <div class="form-actions">
-              <a href="manage.html" class="btn-outline">Manage Events</a>
+              <a href="manage.php" class="btn-outline">Manage Events</a>
               <button
                 class="btn-danger"
                 type="button"
