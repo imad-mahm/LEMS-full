@@ -192,7 +192,7 @@ function toggleFilterPopup() {
       <div class="event-content">
         <h3><?php echo htmlspecialchars($event['EVENT_NAME']); ?></h3>
         <?php $date = date('Y-m-d', strtotime($event['START_TIME'])); $time = date('H:i:s', strtotime($event['START_TIME'])); ?>
-        <div class="event-detail"><span class="icon">🗕️</span><span><?php echo $date; ?></span></div>
+        <div class="event-detail"><span class="icon">📅</span><span><?php echo $date; ?></span></div>
         <div class="event-detail"><span class="icon">⏰</span><span><?php echo $time; ?></span></div>
         <div class="event-detail">
           <span class="icon">📍</span>
