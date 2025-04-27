@@ -17,12 +17,12 @@ if (!isset($_SESSION['user'])) {
   </head>
   <body>
     <header class="navbar">
-      <a class="logo" href="home.html" style="text-decoration: none">
+      <a class="logo" href="home.php" style="text-decoration: none">
         <img src="logo.png" alt="LEMS Logo" />
         <span>LEMS</span>
       </a>
       <nav class="nav-links">
-        <a href="browse.html">Browse Events</a>
+        <a href="browse.php">Browse Events</a>
         <a href="Recommended.html">Recommended</a>
 
         <div class="profile-dropdown">
@@ -33,11 +33,11 @@ if (!isset($_SESSION['user'])) {
             onclick="toggleDropdown()"
           />
           <div id="dropdown-menu" class="dropdown-menu">
-            <a href="profile.html" class="dropdown-item profile-link"
+            <a href="profile.php" class="dropdown-item profile-link"
               >Profile</a
             >
             <a
-              href="index.html"
+              href="auth/logout.php"
               class="dropdown-item logout-link"
               style="color: red"
               >Log Out</a

@@ -38,12 +38,12 @@ if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSIO
       };
     </script>
     <header class="navbar">
-      <a class="logo" href="home.html" style="text-decoration: none">
+      <a class="logo" href="home.php" style="text-decoration: none">
         <img src="logo.png" alt="LEMS Logo" />
         <span>LEMS</span>
       </a>
       <nav class="nav-links">
-        <a href="browse.html">Browse Events</a>
+        <a href="browse.php">Browse Events</a>
         <a href="Recommended.html">Recommended</a>
         <?php
          //look fo ruser in database
@@ -74,7 +74,7 @@ if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSIO
             onclick="toggleDropdown()"
           />
           <div id="dropdown-menu" class="dropdown-menu">
-            <a href="profile.html" class="dropdown-item profile-link"
+            <a href="profile.php" class="dropdown-item profile-link"
               >Profile</a
             >
             <a
@@ -99,7 +99,7 @@ if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSIO
         interests, powered by AI recommendations based on your transcript.
       </p>
       <div class="hero-buttons">
-        <a href="browse.html" class="btn primary">Browse Events</a>
+        <a href="browse.php" class="btn primary">Browse Events</a>
         <a href="Recommended.html" class="btn secondary">Recommended Events</a>
       </div>
     </section>
