@@ -29,7 +29,7 @@ $sql = "SELECT E.*, GROUP_CONCAT(C.CLUB_NAME SEPARATOR ', ') AS CLUB_NAMES
     FROM `event` AS E
     LEFT JOIN `event_club` AS EC ON E.EVENTID = EC.EVENTID
     LEFT JOIN `club` AS C ON EC.CLUBID = C.ID
-    WHERE E.START_TIME > CURRENT_TIMESTAMP() $searchQuery
+    WHERE E.START_TIME > CURRENT_TIMESTAMP() AND STATE = 'approved' $searchQuery
     GROUP BY E.EVENTID
     ORDER BY E.START_TIME ASC";
 
@@ -298,7 +298,7 @@ $events = $result->fetch_all(MYSQLI_ASSOC);
         <div class="progress-bar">
         <?php
         $filled = $event['FILLED_SPOTS'] ?? 0;
-        $total = $event['TOTAL_SPOTS'] ?? 1;
+        $total = $event['CAPACITY'] ?? 1;
         $percentFilled = ($filled / $total) * 100;
         ?>
         <div class="progress" style="width: <?php echo $percentFilled; ?>%;"></div>

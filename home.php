@@ -10,6 +10,7 @@ if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSIO
     header("Location: index.html?error=" . $error_message);
     exit;
   } 
+  
 ?>
 
 <!DOCTYPE html>
@@ -44,6 +45,26 @@ if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSIO
       <nav class="nav-links">
         <a href="browse.html">Browse Events</a>
         <a href="Recommended.html">Recommended</a>
+        <?php
+         //look fo ruser in database
+          $conn = new mysqli('localhost', 'root', '', 'lems');
+          if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+          }
+          $userEmail = $_SESSION['user']['mail'];
+          $sql = "SELECT user_role FROM user WHERE LAU_email = '$userEmail'";
+          $result = $conn->query($sql);
+          if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $_SESSION['user']['user_role'] = $row['user_role'];
+          }
+          if ($_SESSION['user']['user_role'] == 'organizer' || $_SESSION['user']['user_role'] == 'admin') {
+            echo '<a href="CreateEvent.php">Create Event</a>';
+          }
+          if ($_SESSION['user']['user_role'] == 'admin') {
+            echo '<a href="AdminDashboard.php">Admin Dashboard</a>';
+          }
+        ?>
 
         <div class="profile-dropdown">
           <img
