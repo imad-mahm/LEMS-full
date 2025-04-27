@@ -32,7 +32,7 @@ $upcomingResult = $upcomingStmt->get_result();
 $upcomingEvents = $upcomingResult->fetch_all(MYSQLI_ASSOC);
 $upcomingStmt->close();
 
-// Past Events (All completed events)
+// Past Events
 $pastStmt = $conn->prepare("SELECT e.EVENTID, e.EVENT_NAME, e.IMAGE_URL, e.START_TIME, e.END_TIME,
   (SELECT COUNT(*) FROM registration r WHERE r.EVENTID = e.EVENTID AND r.LAU_EMAIL = ?) AS registered
   FROM event e
@@ -68,9 +68,6 @@ $conn->close();
     .btn-view:hover { background-color: #1e7e34; }
     .no-events { text-align: center; margin-top: 50px; color: #555; }
     .footer { padding: 20px; background: #f2f2f2; text-align: center; margin-top: 40px; }
-    .attendance-status { margin-top: 10px; font-weight: bold; }
-    .attended { color: #28a745; }
-    .not-attended { color: #dc3545; }
   </style>
 </head>
 <body>
@@ -146,10 +143,7 @@ function switchTab(tab) {
             <h3><?php echo htmlspecialchars($event['EVENT_NAME']); ?></h3>
             <p><strong>Date:</strong> <?php echo date('Y-m-d', strtotime($event['START_TIME'])); ?></p>
             <p><strong>Time:</strong> <?php echo date('H:i', strtotime($event['START_TIME'])); ?></p>
-            <p class="attendance-status <?php echo $event['registered'] ? 'attended' : 'not-attended'; ?>">
-              <?php echo $event['registered'] ? '✅ You attended' : '❌ You did not attend'; ?>
-            </p>
-            <a href="event.php?event=<?php echo $event['EVENTID']; ?>" class="btn-view">View Event</a>
+            <a href="event_details.php?event=<?php echo $event['EVENTID']; ?>" class="btn-view">View Details & Reviews</a>
           </div>
         </div>
       <?php endforeach; ?>
@@ -159,6 +153,7 @@ function switchTab(tab) {
       </div>
     <?php endif; ?>
   </div>
+
 </main>
 
 <footer class="footer">
