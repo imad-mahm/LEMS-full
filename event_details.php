@@ -108,7 +108,17 @@ $conn->close();
     <?php if (count($reviews) > 0): ?>
       <?php foreach ($reviews as $review): ?>
         <div style="margin-bottom: 20px;">
-          <p><strong>Rating:</strong> <?php echo str_repeat("<span class='star'>&#9733;</span>", intval($review['RATING'])); ?> (<?php echo htmlspecialchars($review['RATING']); ?>/5)</p>
+          <p><strong>Rating:</strong> 
+          <?php 
+          $rating = floatval($review['RATING']);
+          $fullStars = floor($rating);
+          $emptyStars = 5 - $fullStars;
+
+          echo str_repeat("<span class='star'>&#9733;</span>", $fullStars); // Full stars ★
+          echo str_repeat("<span class='star'>&#9734;</span>", $emptyStars); // Empty stars ☆
+          ?> 
+          (<?php echo htmlspecialchars($review['RATING']); ?>/5)
+          </p>
           <p><strong>Comment:</strong> <?php echo nl2br(htmlspecialchars($review['CONTENT'])); ?></p>
           <hr>
         </div>

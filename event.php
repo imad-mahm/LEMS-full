@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: index.html");
+    exit();
+}
 $servername = "localhost";
 $username = "root";
 $password = "";

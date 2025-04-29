@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: login.html");
+    header("Location: index.html");
     exit;
 }
 if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSION['user']['mail'], "lau.edu.lb")){ 
@@ -59,7 +59,7 @@ if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSIO
             $_SESSION['user']['user_role'] = $row['user_role'];
           }
           if ($_SESSION['user']['user_role'] == 'organizer' || $_SESSION['user']['user_role'] == 'admin') {
-            echo '<a href="CreateEvent.php">Create Event</a>';
+            echo '<a href="organizer_dashboard.php">Organizer Dashboard</a>';
           }
           if ($_SESSION['user']['user_role'] == 'admin') {
             echo '<a href="AdminDashboard.php">Admin Dashboard</a>';

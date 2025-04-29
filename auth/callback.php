@@ -1,16 +1,22 @@
 <?php
 if (!isset($_GET['code'])) die('No code returned');
 
+require 'vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+$client_id = $_ENV['Application_ID'];
 // Change this line - use 'common' instead of the specific tenant ID
 $token_url = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
 
 $post_fields = [
-    'client_id' => '33c1718a-480b-4372-810a-a01ce454f3d0',
+    'client_id' => $client_id,
     'scope' => 'openid email profile User.Read',
     'code' => $_GET['code'],
     'redirect_uri' => 'http://localhost/LEMS/auth/callback.php',
     'grant_type' => 'authorization_code',
-    'client_secret' => 'T2f8Q~hW-UHCZ.AxiSVOEvPwAgg0YJbgROOyJcGw'
+    'client_secret' => $_ENV['Secret_Value'],
 ];
 
 $ch = curl_init($token_url);
@@ -42,6 +48,11 @@ $user_response = curl_exec($ch);
 curl_close($ch);
 
 $user = json_decode($user_response, true);
+if(!str_contains($user['mail'], "lau.edu") && !str_contains($user['mail'], "lau.edu.lb")){ 
+    $error_message = urlencode("You are not authorized to access this page.");
+    header("Location: index.html?error=" . $error_message);
+    exit;
+}
 
 // Start session
 session_start();
@@ -67,7 +78,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 if($result->num_rows > 0) {
     // User exists, update their information
-    $stmt = $conn->prepare("UPDATE user SET LAU_EMAIL = ?, USER_ROLE = 'user', FIRST_NAME = ?, LAST_NAME = ? WHERE LAU_EMAIL = ?");
+    $stmt = $conn->prepare("UPDATE user SET LAU_EMAIL = ?, FIRST_NAME = ?, LAST_NAME = ? WHERE LAU_EMAIL = ?");
     //split display name into first and last name
     $display_name = $_SESSION['user']['displayName'];
     $display_name = explode(' ', $display_name, 2);

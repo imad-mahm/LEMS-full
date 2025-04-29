@@ -1,5 +1,11 @@
 <?php
-$client_id = '33c1718a-480b-4372-810a-a01ce454f3d0';
+require 'vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+$client_id = $_ENV['Application_ID'];
+
 $redirect_uri = 'http://localhost/LEMS/auth/callback.php';
 $scope = 'openid email profile User.Read';
 $authorize_url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?" . http_build_query([

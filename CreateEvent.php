@@ -113,8 +113,43 @@ if($_SESSION['user']['user_role'] != 'organizer' && $_SESSION['user']['user_role
                 <input type="number" id="event-duration" name="event_duration" required />
             </div>
             <div class="form-group">
-                <label for="event-location">Location:</label>
-                <input type="text" id="event-location" name="event_location" required />
+            <label for="location">📍 Location:</label>
+            <select id="location" name="location" required>
+                <?php
+                  // Fetch all locations from the database
+                  $stmtLocations = $conn->prepare("SELECT * FROM location");
+                  $stmtLocations->execute();
+                  $resultLocations = $stmtLocations->get_result();
+
+                  while ($row = $resultLocations->fetch_assoc()):
+                    $locationOption = htmlspecialchars($row['CAMPUS'] . ' - ' . $row['BUILDING'] . ' - ' . $row['ROOM']);
+                    $selected = ($row['LOCATIONID'] == $event['LOCATIONID']) ? 'selected' : '';
+                ?>
+                  <option value="<?php echo htmlspecialchars($row['LOCATIONID']); ?>" <?php echo $selected; ?>>
+                    <?php echo $locationOption; ?>
+                  </option>
+                <?php endwhile; ?>
+                <?php $stmtLocations->close(); ?>
+              </select>
+            </div>
+            <div class="form-group">
+                <label for="club">🏢 Club:</label>
+                <select id="club" name="club" required>
+                    <?php
+                    // Fetch all clubs from the database
+                    $stmtClubs = $conn->prepare("SELECT * FROM club");
+                    $stmtClubs->execute();
+                    $resultClubs = $stmtClubs->get_result();
+
+                    while ($row = $resultClubs->fetch_assoc()):
+                        $clubOption = htmlspecialchars($row['CLUB_NAME']);
+                    ?>
+                        <option value="<?php echo htmlspecialchars($row['ID']); ?>">
+                            <?php echo $clubOption; ?>
+                        </option>
+                    <?php endwhile; ?>
+                    <?php $stmtClubs->close(); ?>
+                </select>
             </div>
             <div>
                 <label for="event-capacity">Capacity:</label>
