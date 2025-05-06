@@ -4,10 +4,12 @@ if (!isset($_SESSION['user'])) {
     header("Location: index.html");
     exit();
 }
-if($_SESSION['user']['user_role'] != 'organizer' && $_SESSION['user']['user_role'] != 'admin'){
+if ($_SESSION['user']['role'] != 'organizer' && $_SESSION['user']['role'] != 'admin') {
     header("Location: home.php");
     exit();
 }
+
+include 'db_connection.php';
 ?>
 
 <!DOCTYPE html>
@@ -16,7 +18,7 @@ if($_SESSION['user']['user_role'] != 'organizer' && $_SESSION['user']['user_role
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Create Event | LEMS</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM8d7j3z5l5e5c5e5e5e5e5e5e5e5e5e5e5e5" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM8d7j3z5l5e5e5e5e5e5e5e5e5e5e5e5e5" crossorigin="anonymous" />
         <link rel="stylesheet" href="CreateEvent.css" />
     </head>
     <body>
@@ -50,20 +52,12 @@ if($_SESSION['user']['user_role'] != 'organizer' && $_SESSION['user']['user_role
         <a href="browse.php">Browse Events</a>
         <a href="Recommended.html">Recommended</a>
         <?php
-         //look fo ruser in database
-          $conn = new mysqli('localhost', 'root', '', 'lems');
-          if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+          //check user role
+          if ($_SESSION['user']['role'] == 'organizer' || $_SESSION['user']['role'] == 'admin') {
+            echo '<a href="organizer_dashboard.php">Organizer Dashboard</a>';
           }
-          $userEmail = $_SESSION['user']['mail'];
-          $sql = "SELECT user_role FROM user WHERE LAU_email = '$userEmail'";
-          $result = $conn->query($sql);
-          if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $_SESSION['user']['user_role'] = $row['user_role'];
-          }
-          if ($_SESSION['user']['user_role'] == 'organizer') {
-            echo '<a href="CreateEvent.php">Create Event</a>';
+          if ($_SESSION['user']['role'] == 'admin') {
+            echo '<a href="AdminDashboard.php">Admin Dashboard</a>';
           }
         ?>
 
@@ -109,7 +103,7 @@ if($_SESSION['user']['user_role'] != 'organizer' && $_SESSION['user']['user_role
                 <input type="time" id="event-time" name="event_time" required />
             </div>
             <div class="form-group">
-                <label for="event-time">Duration:</label>
+                <label for="event-duration">Duration (in minutes):</label>
                 <input type="number" id="event-duration" name="event_duration" required />
             </div>
             <div class="form-group">
@@ -118,18 +112,18 @@ if($_SESSION['user']['user_role'] != 'organizer' && $_SESSION['user']['user_role
                 <?php
                   // Fetch all locations from the database
                   $stmtLocations = $conn->prepare("SELECT * FROM location");
-                  $stmtLocations->execute();
-                  $resultLocations = $stmtLocations->get_result();
-
-                  while ($row = $resultLocations->fetch_assoc()):
-                    $locationOption = htmlspecialchars($row['CAMPUS'] . ' - ' . $row['BUILDING'] . ' - ' . $row['ROOM']);
-                    $selected = ($row['LOCATIONID'] == $event['LOCATIONID']) ? 'selected' : '';
+                  if ($stmtLocations) {
+                      $stmtLocations->execute();
+                      $resultLocations = $stmtLocations->get_result();
+                      while ($row = $resultLocations->fetch_assoc()) {
+                          $locationOption = htmlspecialchars($row['CAMPUS'] . ' - ' . $row['BUILDING'] . ' - ' . $row['ROOM']);
+                          echo "<option value='" . htmlspecialchars($row['LOCATIONID']) . "'>$locationOption</option>";
+                      }
+                      $stmtLocations->close();
+                  } else {
+                      echo "<option disabled>Error fetching locations</option>";
+                  }
                 ?>
-                  <option value="<?php echo htmlspecialchars($row['LOCATIONID']); ?>" <?php echo $selected; ?>>
-                    <?php echo $locationOption; ?>
-                  </option>
-                <?php endwhile; ?>
-                <?php $stmtLocations->close(); ?>
               </select>
             </div>
             <div class="form-group">
@@ -138,17 +132,18 @@ if($_SESSION['user']['user_role'] != 'organizer' && $_SESSION['user']['user_role
                     <?php
                     // Fetch all clubs from the database
                     $stmtClubs = $conn->prepare("SELECT * FROM club");
-                    $stmtClubs->execute();
-                    $resultClubs = $stmtClubs->get_result();
-
-                    while ($row = $resultClubs->fetch_assoc()):
-                        $clubOption = htmlspecialchars($row['CLUB_NAME']);
+                    if ($stmtClubs) {
+                        $stmtClubs->execute();
+                        $resultClubs = $stmtClubs->get_result();
+                        while ($row = $resultClubs->fetch_assoc()) {
+                            $clubOption = htmlspecialchars($row['CLUB_NAME']);
+                            echo "<option value='" . htmlspecialchars($row['ID']) . "'>$clubOption</option>";
+                        }
+                        $stmtClubs->close();
+                    } else {
+                        echo "<option disabled>Error fetching clubs</option>";
+                    }
                     ?>
-                        <option value="<?php echo htmlspecialchars($row['ID']); ?>">
-                            <?php echo $clubOption; ?>
-                        </option>
-                    <?php endwhile; ?>
-                    <?php $stmtClubs->close(); ?>
                 </select>
             </div>
             <div>
@@ -157,7 +152,7 @@ if($_SESSION['user']['user_role'] != 'organizer' && $_SESSION['user']['user_role
             </div>
             <div class="form-group">
                 <label for="event-image">Upload Image:</label>
-                <input type="file" id="event-image" name="event_image" accept=".jpg, .jpeg, .png, .gif, .bmp, .webp, .svg+xml, .tiff, .raw, .ico, .jfif, .exif, .indd, .ai, .eps, .pdf, .psd, .cdr, .figma, .sketch, .xd, .svgz" required />
+                <input type="file" id="event-image" name="event_image" accept=".jpg, .jpeg, .png, .gif" required />
             </div>
             <button type="submit">Create Event</button>
         </form>

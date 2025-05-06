@@ -76,7 +76,7 @@ $events = $result->fetch_all(MYSQLI_ASSOC);
 <title>LEMS Event Manager</title>
 <link rel="stylesheet" href="home.css">
 <link rel="stylesheet" href="browse.css">
-<script src="browse.js"></script>
+<script src="script.js"></script>
 <style>
 /* Slide-in Filter Panel */
 #filter-popup { position: fixed; top: 0; right: -400px; width: 320px; height: 100%; background: #f9f9f9; box-shadow: -2px 0 8px rgba(0,0,0,0.2); transition: right 0.3s ease; z-index: 1000; overflow-y: auto; padding: 20px; border-top-left-radius: 12px; border-bottom-left-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }

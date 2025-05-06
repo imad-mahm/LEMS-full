@@ -1,34 +1,22 @@
 <?php
-// filepath: c:\xampp\htdocs\LEMS\cancel_event_logic.php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: index.html");
     exit();
 }
-
-if ($_SESSION['user']['user_role'] != 'organizer' && $_SESSION['user']['user_role'] != 'admin') {
+if ($_SESSION['user']['role'] != 'admin' && $_SESSION['user']['role'] != 'organizer') {
     header("Location: home.php");
     exit();
 }
+include "db_connection.php";
+require_once "classes.php";
 
 if (!isset($_GET['event'])) {
     header("Location: ViewEvents.php");
     exit();
 }
 
-$eventId = intval($_GET['event']);
-
-// Database connection
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$database = 'lems';
-
-$conn = new mysqli($host, $username, $password, $database);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$eventId = intval($_GET['event']);  
 
 // Check if the event exists and is approved
 $stmt = $conn->prepare("SELECT * FROM Event WHERE EVENTID = ? AND STATE = 'approved'");

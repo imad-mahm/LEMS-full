@@ -1,10 +1,12 @@
 <?php
 session_start();
+
 if (!isset($_SESSION['user'])) {
     header("Location: index.html");
     exit;
 }
-if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSION['user']['mail'], "lau.edu.lb")){ 
+// Check if the user is logged in and has a valid email domain
+if(!str_contains($_SESSION['user']['email'], "lau.edu") && !str_contains($_SESSION['user']['email'], "lau.edu.lb")){ 
     session_destroy();
     $error_message = urlencode("You are not authorized to access this page.");
     header("Location: index.html?error=" . $error_message);
@@ -46,22 +48,11 @@ if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSIO
         <a href="browse.php">Browse Events</a>
         <a href="Recommended.html">Recommended</a>
         <?php
-         //look fo ruser in database
-          $conn = new mysqli('localhost', 'root', '', 'lems');
-          if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+         //check user role
+		if ($_SESSION['user']['role'] == 'organizer' || $_SESSION['user']['role'] == 'admin') {
+			echo '<a href="organizer_dashboard.php">Organizer Dashboard</a>';
           }
-          $userEmail = $_SESSION['user']['mail'];
-          $sql = "SELECT user_role FROM user WHERE LAU_email = '$userEmail'";
-          $result = $conn->query($sql);
-          if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $_SESSION['user']['user_role'] = $row['user_role'];
-          }
-          if ($_SESSION['user']['user_role'] == 'organizer' || $_SESSION['user']['user_role'] == 'admin') {
-            echo '<a href="organizer_dashboard.php">Organizer Dashboard</a>';
-          }
-          if ($_SESSION['user']['user_role'] == 'admin') {
+          if ($_SESSION['user']['role'] == 'admin') {
             echo '<a href="AdminDashboard.php">Admin Dashboard</a>';
           }
         ?>
@@ -91,7 +82,7 @@ if(!str_contains($_SESSION['user']['mail'], "lau.edu") && !str_contains($_SESSIO
     <section class="hero">
       <h1>Welcome to LEMS,
         <?php
-          echo "Welcome, " . htmlspecialchars($_SESSION['user']['displayName']);
+          echo htmlspecialchars($_SESSION['user']['firstName']);
         ?>
       </h1>
       <p>

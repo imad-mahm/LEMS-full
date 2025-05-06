@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $eventId = intval($_POST['event_id']);
     $rating = floatval($_POST['rating']);
     $content = trim($_POST['content']);
-    $lau_email = $_SESSION['user']['mail'];
+    $lau_email = $_POST['user'];
 
     $stmt = $conn->prepare("INSERT INTO feedback (RATING, CONTENT, LAU_EMAIL, EVENTID) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("dssi", $rating, $content, $lau_email, $eventId);

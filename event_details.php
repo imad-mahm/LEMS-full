@@ -56,6 +56,13 @@ $reviewsResult = $reviewStmt->get_result();
 $reviews = $reviewsResult->fetch_all(MYSQLI_ASSOC);
 $reviewStmt->close();
 
+// Get AI summary if there are reviews
+$aiSummary = "";
+if (count($reviews) > 0) {
+    require_once 'ai_summarizer.php';
+    $aiSummary = summarizeReviews($reviews);
+}
+
 $conn->close();
 ?>
 
@@ -68,13 +75,15 @@ $conn->close();
   <link rel="stylesheet" href="home.css">
   <link rel="stylesheet" href="browse.css">
   <style>
-    .container { padding: 40px; max-width: 900px; margin: auto; }
-    .details-section, .reviews-section, .submit-review-section { margin-bottom: 40px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.container { padding: 40px; max-width: 900px; margin: auto; }
+    .details-section, .reviews-section, .submit-review-section, .ai-summary-section { margin-bottom: 40px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     .section-title { font-size: 28px; color: #28a745; margin-bottom: 20px; }
     .star { color: gold; }
     textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 10px; }
     .btn-submit, .btn-back { background: #28a745; color: #fff; padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; display: inline-block; text-align: center; text-decoration: none; }
     .btn-submit:hover, .btn-back:hover { background: #1e7e34; }
+    .ai-summary-section { background: #f8f9fa; border-left: 4px solid #28a745; }
+    .ai-summary-title { color: #28a745; font-size: 20px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -102,6 +111,13 @@ $conn->close();
     <p><strong>Organizing Clubs:</strong> <?php echo implode(", ", $clubs); ?></p>
     <p><strong>Tags:</strong> <?php echo implode(", ", $tags); ?></p>
   </div>
+
+  <?php if (count($reviews) > 0): ?>
+  <div class="ai-summary-section">
+    <h2 class="ai-summary-title">AI Summary of Reviews</h2>
+    <p><?php echo nl2br(htmlspecialchars($aiSummary)); ?></p>
+  </div>
+  <?php endif; ?>
 
   <div class="reviews-section">
     <h1 class="section-title">Reviews</h1>
@@ -131,6 +147,7 @@ $conn->close();
   <div class="submit-review-section">
     <h1 class="section-title">Submit Your Review</h1>
     <form method="POST" action="submit_review.php">
+      <input type="hidden" name="user" value="<?php echo $_SESSION['user']['email']; ?>">
       <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
       <label>Rating (0-5):</label><br>
       <input type="number" step="0.5" min="0" max="5" name="rating" required><br><br>

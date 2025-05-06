@@ -55,34 +55,10 @@ if (!isset($_SESSION['user'])) {
           <div class="card">
             <h2>Account Information</h2>
             <?php
-            // Database connection
-            $conn = new mysqli('localhost', 'root', '', 'lems');
-
-            // Check connection
-            if ($conn->connect_error) {
-              die("Connection failed: " . $conn->connect_error);
-            }
-
-            // Fetch user data
-            $user_mail = $_SESSION['user']['mail'];
-            $sql = "SELECT first_name, last_name, lau_email, user_role FROM user WHERE lau_email = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("s", $user_mail);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows > 0) {
-              $user = $result->fetch_assoc();
-              $first_name = htmlspecialchars($user['first_name']);
-              $last_name = htmlspecialchars($user['last_name']);
-              $email = htmlspecialchars($user['lau_email']);
-              $role = htmlspecialchars($user['user_role']);
-            } else {
-              $first_name = $last_name = $email = $role = "Unknown";
-            }
-
-            $stmt->close();
-            $conn->close();
+              $first_name = $_SESSION['user']['firstName'];
+              $last_name = $_SESSION['user']['lastName'];
+              $email = $_SESSION['user']['email'];
+              $role = $_SESSION['user']['role'];
             ?>
 
             <div class="account-header">

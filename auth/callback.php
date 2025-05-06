@@ -1,7 +1,8 @@
 <?php
 if (!isset($_GET['code'])) die('No code returned');
 
-require 'vendor/autoload.php';
+require '../vendor/autoload.php';
+require_once '../classes.php'; // Include your classes here
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
@@ -11,12 +12,12 @@ $client_id = $_ENV['Application_ID'];
 $token_url = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
 
 $post_fields = [
-    'client_id' => $client_id,
-    'scope' => 'openid email profile User.Read',
-    'code' => $_GET['code'],
-    'redirect_uri' => 'http://localhost/LEMS/auth/callback.php',
-    'grant_type' => 'authorization_code',
-    'client_secret' => $_ENV['Secret_Value'],
+	'client_id' => $client_id,
+	'scope' => 'openid email profile User.Read',
+	'code' => $_GET['code'],
+	'redirect_uri' => 'http://localhost/LEMS/auth/callback.php',
+	'grant_type' => 'authorization_code',
+	'client_secret' => $_ENV['Secret_Value'],
 ];
 
 $ch = curl_init($token_url);
@@ -32,10 +33,10 @@ $token_data = json_decode($response, true);
 $access_token = $token_data['access_token'] ?? null;
 
 if (!$access_token) {
-    // For debugging
-    echo "Token response: ";
-    print_r($token_data);
-    die('Failed to get access token');
+	// For debugging
+	echo "Token response: ";
+	print_r($token_data);
+	die('Failed to get access token');
 }
 
 // Get user info
@@ -49,54 +50,45 @@ curl_close($ch);
 
 $user = json_decode($user_response, true);
 if(!str_contains($user['mail'], "lau.edu") && !str_contains($user['mail'], "lau.edu.lb")){ 
-    $error_message = urlencode("You are not authorized to access this page.");
-    header("Location: index.html?error=" . $error_message);
-    exit;
+	$error_message = urlencode("You are not authorized to access this page.");
+	header("Location: ../index.html?error=" . $error_message);
+	exit;
 }
 
 // Start session
 session_start();
 
-// Store complete user object
-$_SESSION['user'] = $user;
-echo $user;
 
-$DB_HOST = 'localhost';
-$DB_USER = 'root';
-$DB_PASS = '';
-$DB_NAME = 'lems';
-
-$conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 // Check if user exists in the database
+include '../db_connection.php'; // Include your database connection file
+
+$DBuser = new User();
+// Check if the user already exists in the database
 $stmt = $conn->prepare("SELECT * FROM user WHERE LAU_email = ?");
-$stmt->bind_param("s", $_SESSION['user']['mail']);
+$stmt->bind_param("s", $user['mail']);
 $stmt->execute();
 $result = $stmt->get_result();
-if($result->num_rows > 0) {
-    // User exists, update their information
-    $stmt = $conn->prepare("UPDATE user SET LAU_EMAIL = ?, FIRST_NAME = ?, LAST_NAME = ? WHERE LAU_EMAIL = ?");
-    //split display name into first and last name
-    $display_name = $_SESSION['user']['displayName'];
-    $display_name = explode(' ', $display_name, 2);
-    $first_name = $display_name[0];
-    $last_name = isset($display_name[1]) ? $display_name[1] : '';
-    $stmt->bind_param("ssss", $_SESSION['user']['mail'], $first_name, $last_name, $_SESSION['user']['mail']);
-    $stmt->execute();
+
+if ($result->num_rows > 0) {
+    // User exists, update their profile
+    $DBuser->updateProfile($user);
+    $DBuser->getUserInfo($user['mail']); // Ensure the object is populated
 } else {
     // User does not exist, insert into database
-    $stmt = $conn->prepare("INSERT INTO user (LAU_EMAIL, USER_ROLE, FIRST_NAME, LAST_NAME) VALUES (?, 'user', ?, ?)");
-    //split display name into first and last name
-    $display_name = $_SESSION['user']['displayName'];
-    $display_name = explode(' ', $display_name, 2);
-    $first_name = $display_name[0];
-    $last_name = isset($display_name[1]) ? $display_name[1] : '';
-    $stmt->bind_param("sss", $_SESSION['user']['mail'], $first_name, $last_name);
-    $stmt->execute();
+    $DBuser->createUser($user);
+    $DBuser->getUserInfo($user['mail']); // Populate the object after creation
 }
+
+// Store user information in session
+$_SESSION['user'] = [
+    'email' => $DBuser->email,
+    'role' => $DBuser->role,
+    'firstName' => $DBuser->firstName,
+    'lastName' => $DBuser->lastName,
+    'clubs' => $DBuser->club
+];
+
 // Redirect to home page
 header('Location: ../home.php');
 exit;

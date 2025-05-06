@@ -15,7 +15,7 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$userEmail = $_SESSION['user']['mail'];
+$userEmail = $_SESSION['user']['email'];
 
 // Update past events to completed
 $conn->query("UPDATE event SET STATE = 'completed' WHERE END_TIME < NOW() AND STATE = 'approved'");

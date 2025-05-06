@@ -220,6 +220,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<?php
+// Get AI summary if there are reviews
+$aiSummary = "";
+if (count($reviews) > 0) {
+    require_once 'ai_summarizer.php';
+    $aiSummary = summarizeReviews($reviews);
+}
+?>
 
 </body>
 </html>
