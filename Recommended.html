@@ -5,73 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Recommended | LEMS</title>
     <link rel="stylesheet" href="recommended.css" />
-    <script type="module">
-      import { faker } from "https://esm.sh/@faker-js/faker";
-
-      fetch("events.json")
-        .then((response) => response.json())
-        .then((events) => {
-          const eventList = document.querySelector(".event-grid");
-          eventList.innerHTML = "";
-
-          events.forEach((event) => {
-            const eventCard = document.createElement("div");
-            eventCard.classList.add("event-card");
-
-            const image = faker.image.url();
-
-            const filled = event.spots_filled || 0;
-            const total = event.spots_total || 20;
-            const percentFilled = Math.min((filled / total) * 100, 100);
-
-            eventCard.innerHTML = `
-      <div class="event-card" onclick="window.location.href='event.html?event=${
-        event.event
-      }&image=${image}'">
-          <div class="event-image">
-            <span class="category-tag">${event.tags || "General"}</span>
-            <img src="${image}" alt="${event.event} image" />
-          </div>
-          <div class="event-content">
-            <h3>${event.event}</h3>
-            <div class="event-detail">
-              <span class="icon">📅</span>
-              <span>${event.date}</span>
-            </div>
-            <div class="event-detail">
-              <span class="icon">⏰</span>
-              <span>${event.time || "TBA"}</span>
-            </div>
-            <div class="event-detail">
-              <span class="icon">📍</span>
-              <span>${event.location}</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress" style="width: ${percentFilled}%;"></div>
-            </div>
-            <p class="spots-filled">${filled} / ${total} spots filled</p>
-            <button class="btn-reserve">Reserve In Person</button>
-          </div>
-        </div>
-      `;
-            eventList.appendChild(eventCard);
-          });
-
-          eventList.classList.remove("empty");
-        })
-        .catch((error) => {
-          console.error("Error loading events:", error);
-        });
-    </script>
   </head>
   <body>
     <header class="navbar">
-      <a class="logo" href="home.html" style="text-decoration: none">
+      <a class="logo" href="home.php" style="text-decoration: none">
         <img src="logo.png" alt="LEMS Logo" />
         <span>LEMS</span>
       </a>
       <nav class="nav-links">
-        <a href="browse.html">Browse Events</a>
+        <a href="browse.php">Browse Events</a>
         <a href="Recommended.html">Recommended</a>
 
         <div class="profile-dropdown">

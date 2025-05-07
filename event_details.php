@@ -1,69 +1,37 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-  header("Location: index.html");
-  exit();
+    header("Location: index.html");
+    exit();
 }
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "lems";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
+require_once 'db_connection.php';
+require_once 'classes.php';
 
 $eventId = isset($_GET['event']) ? intval($_GET['event']) : 0;
 if ($eventId <= 0) {
-  echo "Invalid event.";
-  exit();
+    echo "Invalid event.";
+    exit();
 }
 
-// Fetch event details
-$eventStmt = $conn->prepare("SELECT e.*, l.CAMPUS, l.BUILDING, l.ROOM FROM event e JOIN location l ON e.LOCATIONID = l.LOCATIONID WHERE e.EVENTID = ?");
-$eventStmt->bind_param("i", $eventId);
-$eventStmt->execute();
-$eventResult = $eventStmt->get_result();
-$event = $eventResult->fetch_assoc();
-$eventStmt->close();
+$event = new Event();
+$event->getDetails($eventId);
 
 if (!$event) {
-  echo "Event not found.";
-  exit();
+    echo "Event not found.";
+    exit();
 }
 
-// Fetch clubs
-$clubsResult = $conn->query("SELECT c.CLUB_NAME FROM club c JOIN event_club ec ON c.ID = ec.CLUBID WHERE ec.EVENTID = $eventId");
-$clubs = [];
-while ($row = $clubsResult->fetch_assoc()) {
-  $clubs[] = $row['CLUB_NAME'];
-}
-
-// Fetch tags
-$tagsResult = $conn->query("SELECT TAG FROM event_tags WHERE EVENTID = $eventId");
-$tags = [];
-while ($row = $tagsResult->fetch_assoc()) {
-  $tags[] = $row['TAG'];
-}
-
-// Fetch reviews
-$reviewStmt = $conn->prepare("SELECT * FROM feedback WHERE EVENTID = ?");
-$reviewStmt->bind_param("i", $eventId);
-$reviewStmt->execute();
-$reviewsResult = $reviewStmt->get_result();
-$reviews = $reviewsResult->fetch_all(MYSQLI_ASSOC);
-$reviewStmt->close();
+// Fetch feedback using FeedbackManager
+$feedbackManager = new FeedbackManager();
+$reviews = $feedbackManager->getFeedbackFor($eventId);
 
 // Get AI summary if there are reviews
 $aiSummary = "";
 if (count($reviews) > 0) {
-    require_once 'ai_summarizer.php';
-    $aiSummary = summarizeReviews($reviews);
+    $aiSummary = $feedbackManager->summarizeReviews($reviews);
 }
 
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -101,15 +69,28 @@ $conn->close();
 
   <div class="details-section">
     <h1 class="section-title">Event Details</h1>
-    <p><strong>Name:</strong> <?php echo htmlspecialchars($event['EVENT_NAME']); ?></p>
-    <p><strong>Description:</strong> <?php echo nl2br(htmlspecialchars($event['EVENT_DESCRIPTION'])); ?></p>
-    <p><strong>Duration:</strong> <?php echo htmlspecialchars($event['DURATION']); ?> minutes</p>
-    <p><strong>Date:</strong> <?php echo date('Y-m-d', strtotime($event['START_TIME'])); ?></p>
-    <p><strong>Time:</strong> <?php echo date('H:i', strtotime($event['START_TIME'])); ?> to <?php echo date('H:i', strtotime($event['END_TIME'])); ?></p>
-    <p><strong>Location:</strong> <?php echo htmlspecialchars($event['CAMPUS'] . ", " . $event['BUILDING'] . ", " . $event['ROOM']); ?></p>
-    <p><strong>Capacity:</strong> <?php echo htmlspecialchars($event['CAPACITY']); ?> attendees</p>
-    <p><strong>Organizing Clubs:</strong> <?php echo implode(", ", $clubs); ?></p>
-    <p><strong>Tags:</strong> <?php echo implode(", ", $tags); ?></p>
+    <p><strong>Name:</strong> <?php echo htmlspecialchars($event->title); ?></p>
+    <p><strong>Description:</strong> <?php echo nl2br(htmlspecialchars($event->description)); ?></p>
+    <p><strong>Duration:</strong> <?php echo htmlspecialchars($event->duration); ?> minutes</p>
+    <p><strong>Date:</strong> <?php echo date('Y-m-d', strtotime($event->startTime)); ?></p>
+    <p><strong>Time:</strong> <?php echo date('H:i', strtotime($event->startTime)); ?> to <?php echo date('H:i', strtotime($event->endTime)); ?></p>
+ 
+    <?php
+    // Fetch location details from the database
+      $locationId = intval($event->location);
+      $locationQuery = $conn->prepare("SELECT CAMPUS, BUILDING, ROOM FROM location WHERE locationid = ?");
+      $locationQuery->bind_param("i", $locationId);
+      $locationQuery->execute();
+      $locationResult = $locationQuery->get_result();
+
+      if ($locationResult->num_rows > 0) {
+        $locationData = $locationResult->fetch_assoc();
+      }
+
+      $locationQuery->close();
+    ?>
+    <p><strong>Location:</strong> <?php echo htmlspecialchars($locationData['CAMPUS'] . ", " . $locationData['BUILDING'] . ", " . $locationData['ROOM']); ?></p>
+    <p><strong>Capacity:</strong> <?php echo htmlspecialchars($event->capacity) ?> seats</p>
   </div>
 
   <?php if (count($reviews) > 0): ?>
@@ -124,37 +105,26 @@ $conn->close();
     <?php if (count($reviews) > 0): ?>
       <?php foreach ($reviews as $review): ?>
         <div style="margin-bottom: 20px;">
+        <p><strong>User:</strong> <?php echo htmlspecialchars($review->user); ?></p>
           <p><strong>Rating:</strong> 
           <?php 
-          $rating = floatval($review['RATING']);
+          $rating = floatval($review->rating);
           $fullStars = floor($rating);
           $emptyStars = 5 - $fullStars;
 
           echo str_repeat("<span class='star'>&#9733;</span>", $fullStars); // Full stars ★
           echo str_repeat("<span class='star'>&#9734;</span>", $emptyStars); // Empty stars ☆
           ?> 
-          (<?php echo htmlspecialchars($review['RATING']); ?>/5)
-          </p>
-          <p><strong>Comment:</strong> <?php echo nl2br(htmlspecialchars($review['CONTENT'])); ?></p>
-          <hr>
+          (<?php echo htmlspecialchars($review->rating); ?>/5)
+</p>
+
+          <p><strong>Comment:</strong> <?php echo nl2br(htmlspecialchars($review->comment)); ?></p>
+          <p><strong>Date:</strong> <?php echo htmlspecialchars($review->timestamp); ?></p>          <hr>
         </div>
       <?php endforeach; ?>
     <?php else: ?>
       <p>No reviews yet.</p>
     <?php endif; ?>
-  </div>
-
-  <div class="submit-review-section">
-    <h1 class="section-title">Submit Your Review</h1>
-    <form method="POST" action="submit_review.php">
-      <input type="hidden" name="user" value="<?php echo $_SESSION['user']['email']; ?>">
-      <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
-      <label>Rating (0-5):</label><br>
-      <input type="number" step="0.5" min="0" max="5" name="rating" required><br><br>
-      <label>Comment:</label><br>
-      <textarea name="content" rows="4" required></textarea><br>
-      <button type="submit" class="btn-submit">Submit Review</button>
-    </form>
   </div>
 </main>
 
@@ -164,3 +134,7 @@ $conn->close();
 
 </body>
 </html>
+
+<?php 
+$conn->close();
+?>
