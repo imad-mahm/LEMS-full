@@ -4,15 +4,8 @@ if (!isset($_SESSION['user'])) {
     header("Location: index.html");
     exit();
 }
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "lems";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include "db_connection.php";
+require_once "classes.php";
 
 if (!isset($_GET['event'])) {
     die("No event selected.");
@@ -21,38 +14,25 @@ if (!isset($_GET['event'])) {
 $eventId = intval($_GET['event']);
 
 // Fetch event details
-$stmt = $conn->prepare("SELECT * FROM event WHERE EVENTID = ?");
-$stmt->bind_param("i", $eventId);
-$stmt->execute();
-$result = $stmt->get_result();
-$event = $result->fetch_assoc();
-$stmt->close();
-
-if (!$event) {
+$event = new Event();
+$event->getDetails($eventId);
+if (!$event->title) {
     die("Event not found.");
 }
 
 // Fetch location details
 $stmtLocation = $conn->prepare("SELECT * FROM location WHERE LOCATIONID = ?");
-$stmtLocation->bind_param("i", $event['LOCATIONID']);
+$stmtLocation->bind_param("i", $event->location);
 $stmtLocation->execute();
 $resultLocation = $stmtLocation->get_result();
 $location = $resultLocation->fetch_assoc();
-$stmtLocation->close();
+if (!$location) {
+    die("Location not found. $event->location , location: ");
+}
 
 // Check if user is already registered
-$alreadyRegistered = false;
-if (isset($_SESSION['user']['mail'])) {
-    $lau_email = $_SESSION['user']['mail'];
-    $check_stmt = $conn->prepare("SELECT 1 FROM registration WHERE LAU_EMAIL = ? AND EVENTID = ?");
-    $check_stmt->bind_param("si", $lau_email, $eventId);
-    $check_stmt->execute();
-    $check_stmt->store_result();
-    if ($check_stmt->num_rows > 0) {
-        $alreadyRegistered = true;
-    }
-    $check_stmt->close();
-}
+$registration = new Registration();
+$alreadyRegistered = $registration->getRegistrationInfo($_SESSION['user']['email'], $eventId);
 ?>
 
 <!DOCTYPE html>
@@ -60,7 +40,7 @@ if (isset($_SESSION['user']['mail'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?php echo htmlspecialchars($event['EVENT_NAME']); ?> - Event Details</title>
+  <title><?php echo htmlspecialchars($event->title); ?> - Event Details</title>
  
   <style>
     body {
@@ -160,15 +140,15 @@ if (isset($_SESSION['user']['mail'])) {
 <main>
   <div class="event-details-container">
     <div class="event-details">
-      <h1><?php echo htmlspecialchars($event['EVENT_NAME']); ?></h1>
-      <img src="<?php echo htmlspecialchars($event['IMAGE_URL']); ?>" alt="Event Image">
+      <h1><?php echo htmlspecialchars($event->title); ?></h1>
+      <img src="<?php echo htmlspecialchars($event->imageURL); ?>" alt="Event Image">
 
       <div class="event-info">
-        <p><span>📝 Description:</span> <?php echo nl2br(htmlspecialchars($event['EVENT_DESCRIPTION'])); ?></p>
-        <p><span>🗓️ Start Time:</span> <?php echo htmlspecialchars($event['START_TIME']); ?></p>
-        <p><span>⏰ End Time:</span> <?php echo htmlspecialchars($event['END_TIME']); ?></p>
+        <p><span>📝 Description:</span> <?php echo nl2br(htmlspecialchars($event->description)); ?></p>
+        <p><span>🗓️ Start Time:</span> <?php echo htmlspecialchars($event->startTime); ?></p>
+        <p><span>⏰ End Time:</span> <?php echo htmlspecialchars($event->endTime); ?></p>
         <p><span>📍 Location:</span> <?php echo htmlspecialchars($location['CAMPUS']) . ", " . htmlspecialchars($location['BUILDING']) . ", " . htmlspecialchars($location['ROOM']); ?></p>
-        <p><span>👥 Capacity:</span> <?php echo htmlspecialchars($event['CAPACITY']); ?> people</p>
+        <p><span>👥 Capacity:</span> <?php echo htmlspecialchars($event->capacity); ?> people</p>
       </div>
 
       <div style="text-align:center;">
@@ -220,18 +200,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-<?php
-// Get AI summary if there are reviews
-$aiSummary = "";
-if (count($reviews) > 0) {
-    require_once 'ai_summarizer.php';
-    $aiSummary = summarizeReviews($reviews);
-}
-?>
-
 </body>
 </html>
 
 <?php
 $conn->close();
+$stmtLocation->close();
 ?>

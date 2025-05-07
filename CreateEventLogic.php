@@ -4,7 +4,7 @@ if (!isset($_SESSION['user'])) {
     header("Location: index.html");
     exit();
 }
-if ($_SESSION['user']['user_role'] != 'admin' && $_SESSION['user']['user_role'] != 'organizer') {
+if ($_SESSION['user']['role'] != 'admin' && $_SESSION['user']['role'] != 'organizer') {
     header("Location: home.php");
     exit();
 }

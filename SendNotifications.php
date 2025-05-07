@@ -177,7 +177,7 @@ p {
 		<form method="POST" action="SendNotifications.php">
 			<?php
 				$eventManager = new EventManager();
-				$eventManager->getAllEvents();
+				$eventManager->getAllEvents("future", "approved", $_SESSION['user']['clubs'][0]);
 				$events = $eventManager->events;
 			?>
 			<label for="event_id">Select Event:</label>

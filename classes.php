@@ -207,10 +207,15 @@ class EventManager {
 		include 'db_connection.php';
 
 		// Build the base query
-		$query = "SELECT * FROM `event` e WHERE STATE = ?";
+		$query = "SELECT EVENTID FROM `event` e ";
+		if($state = "all"){
+			$query .= "WHERE 1=1";
+		} else {
+			$query .= "WHERE STATE = ?";
+		}
 		if ($time == "past") {
 			$query .= " AND START_TIME < current_timestamp()";
-		} else {
+		} else if ($time == "future") {
 			$query .= " AND START_TIME > current_timestamp()";
 		}
 
@@ -224,9 +229,15 @@ class EventManager {
 
 		// Bind parameters
 		if ($clubID !== null) {
-			$stmt->bind_param("si", $state, $clubID);
+			if ($state == "all") {
+				$stmt->bind_param("i", $clubID);
+			} else {
+				$stmt->bind_param("si", $state, $clubID);
+			}
 		} else {
-			$stmt->bind_param("s", $state);
+			if ($state != "all") {
+				$stmt->bind_param("s", $state);
+			}
 		}
 
 		// Execute the query
@@ -238,17 +249,9 @@ class EventManager {
 		if ($result->num_rows > 0) {
 			while ($row = $result->fetch_assoc()) {
 				$event = new Event();
-				$event->eventID = $row['EVENTID'];
-				$event->title = $row['EVENT_NAME'];
-				$event->description = $row['EVENT_DESCRIPTION'];
-				$event->duration = $row['DURATION'];
-				$event->startTime = $row['START_TIME'];
-				$event->endTime = $row['END_TIME'];
-				$event->location = $row['LOCATIONID'];
-				$event->state = $row['STATE'];
-				$event->capacity = $row['CAPACITY'];
-				$event->imageURL = $row['IMAGE_URL'];
+				$event->getDetails($row['EVENTID']);
 				$this->events[] = $event;
+				$this->eventIDs[] = $row['EVENTID'];
 			}
 		}
 
@@ -347,7 +350,7 @@ class Event {
 		$stmt->close();
 		return true;
 	}
-	public function editEvent() {
+	public function updateEvent() {
 		include 'db_connection.php';
 		if($this->state != "approved" && $this->state != "pending"){
 			return false;

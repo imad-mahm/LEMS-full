@@ -131,7 +131,8 @@ include 'db_connection.php';
                 <select id="club" name="club" required>
                     <?php
                     // Fetch all clubs from the database
-                    $stmtClubs = $conn->prepare("SELECT * FROM club");
+                    $stmtClubs = $conn->prepare("SELECT * FROM club where ID = ?");
+                    $stmtClubs->bind_param("i", $_SESSION['user']['clubs'][0]);
                     if ($stmtClubs) {
                         $stmtClubs->execute();
                         $resultClubs = $stmtClubs->get_result();

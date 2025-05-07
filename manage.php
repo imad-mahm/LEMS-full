@@ -20,29 +20,33 @@ $userEmail = $_SESSION['user']['email'];
 // Update past events to completed
 $conn->query("UPDATE event SET STATE = 'completed' WHERE END_TIME < NOW() AND STATE = 'approved'");
 
-// Upcoming Events
-$upcomingStmt = $conn->prepare("SELECT e.EVENTID, e.EVENT_NAME, e.IMAGE_URL, e.START_TIME, e.END_TIME
-        FROM event e
-        JOIN registration r ON e.EVENTID = r.EVENTID
-        WHERE r.LAU_EMAIL = ? AND e.STATE = 'approved'
-        ORDER BY e.START_TIME ASC");
-$upcomingStmt->bind_param("s", $userEmail);
-$upcomingStmt->execute();
-$upcomingResult = $upcomingStmt->get_result();
-$upcomingEvents = $upcomingResult->fetch_all(MYSQLI_ASSOC);
-$upcomingStmt->close();
+// Use the Event class to fetch and display upcoming events
+require_once 'classes.php';
 
-// Past Events
-$pastStmt = $conn->prepare("SELECT e.EVENTID, e.EVENT_NAME, e.IMAGE_URL, e.START_TIME, e.END_TIME,
-  (SELECT COUNT(*) FROM registration r WHERE r.EVENTID = e.EVENTID AND r.LAU_EMAIL = ?) AS registered
-  FROM event e
-  WHERE e.STATE = 'completed'
-  ORDER BY e.START_TIME DESC");
-$pastStmt->bind_param("s", $userEmail);
-$pastStmt->execute();
-$pastResult = $pastStmt->get_result();
-$pastEvents = $pastResult->fetch_all(MYSQLI_ASSOC);
-$pastStmt->close();
+$upcomingEvents = [];
+$stmt = $conn->prepare("SELECT EVENTID FROM event WHERE START_TIME > NOW() AND STATE = 'approved'");
+$stmt->execute();
+$result = $stmt->get_result();
+
+while ($row = $result->fetch_assoc()) {
+    $event = new Event();
+    $event->getDetails($row['EVENTID']);
+    $upcomingEvents[] = $event;
+}
+$stmt->close();
+
+// Use the Event class to fetch and display past events
+$pastEvents = [];
+$stmt = $conn->prepare("SELECT EVENTID FROM event WHERE END_TIME < NOW() AND STATE = 'completed'");
+$stmt->execute();
+$result = $stmt->get_result();
+
+while ($row = $result->fetch_assoc()) {
+    $event = new Event();
+    $event->getDetails($row['EVENTID']);
+    $pastEvents[] = $event;
+}
+$stmt->close();
 
 $conn->close();
 ?>
@@ -113,13 +117,13 @@ function switchTab(tab) {
       <?php foreach ($upcomingEvents as $event): ?>
         <div class="event-card">
           <div class="event-image">
-            <img src="<?php echo htmlspecialchars($event['IMAGE_URL']); ?>" alt="Event Image">
+            <img src="<?php echo htmlspecialchars($event->imageURL); ?>" alt="Event Image">
           </div>
           <div class="event-content">
-            <h3><?php echo htmlspecialchars($event['EVENT_NAME']); ?></h3>
-            <p><strong>Date:</strong> <?php echo date('Y-m-d', strtotime($event['START_TIME'])); ?></p>
-            <p><strong>Time:</strong> <?php echo date('H:i', strtotime($event['START_TIME'])); ?></p>
-            <a href="event.php?event=<?php echo $event['EVENTID']; ?>" class="btn-view">View Event</a>
+            <h3><?php echo htmlspecialchars($event->title); ?></h3>
+            <p><strong>Date:</strong> <?php echo date('Y-m-d', strtotime($event->startTime)); ?></p>
+            <p><strong>Time:</strong> <?php echo date('H:i', strtotime($event->startTime)); ?></p>
+            <a href="event.php?event=<?php echo $event->eventID; ?>" class="btn-view">View Event</a>
           </div>
         </div>
       <?php endforeach; ?>
@@ -137,13 +141,13 @@ function switchTab(tab) {
       <?php foreach ($pastEvents as $event): ?>
         <div class="event-card">
           <div class="event-image">
-            <img src="<?php echo htmlspecialchars($event['IMAGE_URL']); ?>" alt="Event Image">
+            <img src="<?php echo htmlspecialchars($event->imageURL); ?>" alt="Event Image">
           </div>
           <div class="event-content">
-            <h3><?php echo htmlspecialchars($event['EVENT_NAME']); ?></h3>
-            <p><strong>Date:</strong> <?php echo date('Y-m-d', strtotime($event['START_TIME'])); ?></p>
-            <p><strong>Time:</strong> <?php echo date('H:i', strtotime($event['START_TIME'])); ?></p>
-            <a href="event_details.php?event=<?php echo $event['EVENTID']; ?>" class="btn-view">View Details & Reviews</a>
+            <h3><?php echo htmlspecialchars($event->title); ?></h3>
+            <p><strong>Date:</strong> <?php echo date('Y-m-d', strtotime($event->startTime)); ?></p>
+            <p><strong>Time:</strong> <?php echo date('H:i', strtotime($event->startTime)); ?></p>
+            <a href="event.php?event=<?php echo $event->eventID; ?>" class="btn-view">View Event</a>
           </div>
         </div>
       <?php endforeach; ?>
