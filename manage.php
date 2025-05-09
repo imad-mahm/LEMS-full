@@ -5,17 +5,7 @@ if (!isset($_SESSION['user'])) {
   exit();
 }
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "lems";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
-
-$userEmail = $_SESSION['user']['email'];
+include "db_connection.php";
 
 // Update past events to completed
 $conn->query("UPDATE event SET STATE = 'completed' WHERE END_TIME < NOW() AND STATE = 'approved'");
@@ -23,32 +13,14 @@ $conn->query("UPDATE event SET STATE = 'completed' WHERE END_TIME < NOW() AND ST
 // Use the Event class to fetch and display upcoming events
 require_once 'classes.php';
 
-$upcomingEvents = [];
-$stmt = $conn->prepare("SELECT EVENTID FROM event WHERE START_TIME > NOW() AND STATE = 'approved'");
-$stmt->execute();
-$result = $stmt->get_result();
-
-while ($row = $result->fetch_assoc()) {
-    $event = new Event();
-    $event->getDetails($row['EVENTID']);
-    $upcomingEvents[] = $event;
-}
-$stmt->close();
-
+$eventManagerUpcoming = new EventManager();
+$eventManagerUpcoming->getAllEvents("future");
+$upcomingEvents = $eventManagerUpcoming->events;
 // Use the Event class to fetch and display past events
-$pastEvents = [];
-$stmt = $conn->prepare("SELECT EVENTID FROM event WHERE END_TIME < NOW() AND STATE = 'completed'");
-$stmt->execute();
-$result = $stmt->get_result();
+$eventManagerPast = new EventManager();
+$eventManagerPast->getAllEvents("past");
+$pastEvents = $eventManagerPast->events;
 
-while ($row = $result->fetch_assoc()) {
-    $event = new Event();
-    $event->getDetails($row['EVENTID']);
-    $pastEvents[] = $event;
-}
-$stmt->close();
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
