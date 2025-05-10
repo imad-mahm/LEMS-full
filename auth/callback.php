@@ -3,8 +3,10 @@ if (!isset($_GET['code'])) die('No code returned');
 
 require '../vendor/autoload.php';
 require_once '../classes.php'; // Include your classes here
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+// get the .env file from parent directory
+// Make sure to include the correct path to your .env file
+// and load it using the Dotenv library
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
 $client_id = $_ENV['Application_ID'];
@@ -73,12 +75,12 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     // User exists, update their profile
     $DBuser->updateProfile($user);
-    $DBuser->getUserInfo($user['mail']); // Ensure the object is populated
 } else {
     // User does not exist, insert into database
     $DBuser->createUser($user);
-    $DBuser->getUserInfo($user['mail']); // Populate the object after creation
 }
+$DBuser->getUserInfo($user['mail']); // Ensure the object is populated
+$DBuser->getUserPreferences();
 
 // Store user information in session
 $_SESSION['user'] = [
@@ -86,7 +88,8 @@ $_SESSION['user'] = [
     'role' => $DBuser->role,
     'firstName' => $DBuser->firstName,
     'lastName' => $DBuser->lastName,
-    'clubs' => $DBuser->club
+    'clubs' => $DBuser->club,
+	'preferences' => $DBuser->pref,
 ];
 
 // Redirect to home page

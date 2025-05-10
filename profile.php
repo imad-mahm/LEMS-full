@@ -23,7 +23,7 @@ if (!isset($_SESSION['user'])) {
       </a>
       <nav class="nav-links">
         <a href="browse.php">Browse Events</a>
-        <a href="Recommended.html">Recommended</a>
+        <a href="Recommended.php">Recommended</a>
 
         <div class="profile-dropdown">
           <img
@@ -82,27 +82,34 @@ if (!isset($_SESSION['user'])) {
             </div>
           </div>
 
-          <div class="card">
-            <h2>Academic Profile</h2>
-            <p>
-              Upload and manage your transcript for personalized recommendations
-            </p>
-            <div class="custom-file">
-              <label for="transcript" class="file-box">
-                <img
-                  src="https://img.icons8.com/ios-filled/24/065f46/file--v1.png"
-                  alt="File Icon"
-                  class="file-icon"
-                />
-                <span id="file-label">Choose a PDF file</span>
-              </label>
-              <input type="file" id="transcript" accept=".pdf" />
-            </div>
+          <?php
+          if (isset($_SESSION['user']['preferences'][0]) && $_SESSION['user']['preferences'][0] !== null) {
+              echo '<div class="card">';
+              echo '<h2>Your Preferences</h2>';
+              echo '<ul class="preferences-list">';
+              foreach ($_SESSION['user']['preferences'] as $preference) {
+                  echo '<li>' . htmlspecialchars($preference) . '</li>';
+              }
+              echo '</ul>';
+              echo '</div>';
+          } else {
+              echo '<div class="card">';
+              echo '<h2>Academic Profile</h2>';
+              echo '<p>Upload and manage your transcript for personalized recommendations</p>';
+              echo '<div class="custom-file">';
+              echo '<label for="transcript" class="file-box">';
+              echo '<img src="https://img.icons8.com/ios-filled/24/065f46/file--v1.png" alt="File Icon" class="file-icon" />';
+              echo '<span id="file-label">Choose a PDF file</span>';
+              echo '</label>';
+              echo '<input type="file" id="transcript" accept=".pdf" />';
+              echo '</div>';
+              echo '<div class="form-actions">';
+              echo '<button class="btn-success">Upload Transcript</button>';
+              echo '</div>';
+              echo '</div>';
+          }
+          ?>
 
-            <div class="form-actions">
-              <button class="btn-success">Upload Transcript</button>
-            </div>
-          </div>
         </section>
 
         <aside class="right-panel">

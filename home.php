@@ -46,7 +46,7 @@ if(!str_contains($_SESSION['user']['email'], "lau.edu") && !str_contains($_SESSI
       </a>
       <nav class="nav-links">
         <a href="browse.php">Browse Events</a>
-        <a href="Recommended.html">Recommended</a>
+        <a href="Recommended.php">Recommended</a>
         <?php
          //check user role
 		if ($_SESSION['user']['role'] == 'organizer' || $_SESSION['user']['role'] == 'admin') {
@@ -91,7 +91,7 @@ if(!str_contains($_SESSION['user']['email'], "lau.edu") && !str_contains($_SESSI
       </p>
       <div class="hero-buttons">
         <a href="browse.php" class="btn primary">Browse Events</a>
-        <a href="Recommended.html" class="btn secondary">Recommended Events</a>
+        <a href="Recommended.php" class="btn secondary">Recommended Events</a>
       </div>
     </section>
 

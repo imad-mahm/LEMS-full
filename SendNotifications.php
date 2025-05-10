@@ -130,7 +130,7 @@ p {
 	  </a>
 	  <nav class="nav-links">
 		<a href="browse.php">Browse Events</a>
-		<a href="Recommended.html">Recommended</a>
+		<a href="Recommended.php">Recommended</a>
 		<?php
 		 //check user role
 		if ($_SESSION['user']['role'] == 'organizer' || $_SESSION['user']['role'] == 'admin') {

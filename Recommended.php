@@ -1,3 +1,18 @@
+<?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: index.html");
+    exit();
+}
+$flag = false;
+if ($_SESSION['user']['preferences'][0] !== null) {
+    global $flag;
+    $flag = true;
+}
+
+include 'db_connection.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -5,7 +20,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Recommended | LEMS</title>
     <link rel="stylesheet" href="recommended.css" />
-  </head>
+    </head>
   <body>
     <header class="navbar">
       <a class="logo" href="home.php" style="text-decoration: none">
@@ -14,7 +29,7 @@
       </a>
       <nav class="nav-links">
         <a href="browse.php">Browse Events</a>
-        <a href="Recommended.html">Recommended</a>
+        <a href="Recommended.php">Recommended</a>
 
         <div class="profile-dropdown">
           <img
@@ -47,23 +62,25 @@
         <p>
           Upload and manage your transcript for personalized recommendations
         </p>
-        <div class="custom-file">
-          <label for="transcript" class="file-box">
-            <img
-              src="https://img.icons8.com/ios-filled/24/065f46/file--v1.png"
-              alt="File Icon"
-              class="file-icon"
-            />
-            <span id="file-label">Choose a PDF file</span>
-          </label>
-          <input type="file" id="transcript" accept=".pdf" />
-        </div>
+        <form action="FileUpload.php" method="post" enctype="multipart/form-data">
+          <div class="custom-file">
+            <label for="pdf_file" class="file-box">
+              <img
+            src="https://img.icons8.com/ios-filled/24/065f46/file--v1.png"
+            alt="File Icon"
+            class="file-icon"
+              />
+              <span id="file-label">Choose a PDF file</span>
+            </label>
+            <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" />
+          </div>
 
-        <div class="form-actions">
-          <button class="btn-success" onclick="showRecommendations()">
-            Upload Transcript
-          </button>
-        </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-success">
+              Upload Transcript
+            </button>
+          </div>
+        </form>
       </div>
       <section id="recommendations" style="display: none">
         <h2 style="padding: 0 2rem">
@@ -91,14 +108,10 @@
         }
       };
       function showRecommendations() {
-        if (transcriptInput.files.length > 0) {
           document.getElementById("upload-card").style.display = "none";
           document.getElementById("recommendations").style.display = "block";
-        } else {
-          alert("Please upload a transcript PDF first.");
-        }
       }
-      const transcriptInput = document.getElementById("transcript");
+      const transcriptInput = document.getElementById("pdf_file");
       const fileLabel = document.getElementById("file-label");
 
       transcriptInput.addEventListener("change", () => {
@@ -108,6 +121,11 @@
           fileLabel.textContent = "Choose a PDF file";
         }
       });
+      <?php 
+      if ($flag == true) {
+        echo "showRecommendations();";
+      }
+      ?>
     </script>
   </body>
 </html>

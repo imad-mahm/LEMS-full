@@ -8,30 +8,14 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 // use Google_Client;
 // use Google_Service_Gmail;
 
-class AuthService {
-	public function logout() {
-
-	}
-	public function loginWithSSO($token) {
-
-	}
-	private function getUserInfoFromSSO($token) {
-
-	}
-	private function isLauEmail($email) {
-
-	}
-	private function validateToken($token) {
-
-	}
-}
-
 class User {
 	public $email;
 	public $role;
 	public $firstName;
 	public $lastName;
 	public $club = [];
+	public $prefs = [];
+	
 	public function createUser($param) {
 		include 'db_connection.php';
 		$userRole = "user";
@@ -91,6 +75,33 @@ class User {
 		$stmt->execute();
 		$stmt->close();
 	}
+
+	public function updatePrefs($prefArr) {
+		include "db_connection.php";
+		$stmt = $conn->prepare("INSERT INTO USER_PREFERENCES(LAU_EMAIL, PREFERENCE) VALUES (?,?)");
+		foreach($prefArr as $pref){
+			$stmt->bind_param("ss", $this->email, $pref);
+			$stmt->execute();
+		}
+	}
+
+	public function getUserPreferences() {
+		include 'db_connection.php';
+		$stmt = $conn->prepare("SELECT PREFERENCE FROM USER_PREFERENCES WHERE LAU_EMAIL = ?");
+		$stmt->bind_param("s", $this->email);
+		$stmt->execute();
+		$result = $stmt->get_result();
+
+		$preferences = [];
+		while ($row = $result->fetch_assoc()) {
+			$preferences[] = $row['PREFERENCE'];
+		}
+
+		$stmt->close();
+		$this->pref = $preferences;
+		return $preferences;
+	}
+
 	public function viewPastEvents() {
 		include 'db_connection.php';
 		$stmt = $conn->prepare("SELECT * FROM `event` WHERE START_TIME < current_timestamp() AND eventid IN (SELECT eventid FROM user_attended_events WHERE user_email = ?)");
@@ -437,16 +448,13 @@ class FeedbackManager {
 	
 		// Create the prompt for OpenAI
 		$prompt = "You are an expert event reviewer and writer. You will receive a list of reviews written by attendees of an event. Your task is to summarize these reviews into one well-written, balanced, and engaging summary that reflects the overall sentiment, highlights common themes, praises, and criticisms, and reads as if written by a professional reviewer.
-	
-	Instructions:
-	
-	Combine all major points from the reviews into one cohesive review.
-	
-	Reflect the overall tone (positive, negative, or mixed).
-	
-	Include commonly mentioned strengths and weaknesses.
-	
-	Use natural, fluent language suitable for publication on a website or report. The reviews are: " . $reviewsText . " Limit the summary to 50 words.";
+				Instructions:
+				-Combine all major points from the reviews into one cohesive review.
+				-Reflect the overall tone (positive, negative, or mixed).
+				-Include commonly mentioned strengths and weaknesses.
+				-Don't make up any new information or opinions.
+				-Use natural, fluent language suitable for publication on a website or report. 
+				The reviews are: " . $reviewsText . " Limit the summary to 50 words.";
 	
 		try {
 			// Call OpenAI API
@@ -543,20 +551,6 @@ class Registration {
 	}
 }
 
-class Transcript {
-	public $transcriptID;
-	public $user;
-	public $uploadDate;
-	public $dataExtracted;
-	//AI LOGIC
-	public function uploadTranscript() {
-
-	}
-	public function getRecommendations() {
-
-	}
-}
-
 class Notification {
 	public $notificationID;
 	public $recipients = [];
@@ -635,10 +629,6 @@ class Partner {
 
 	}
 }
-
-?>
-
-<?php
 
 class LiveStream {
 	public $streamID;
