@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Live Stream</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link rel="stylesheet" href="recommended.css" />
+    <style>
+      body {
+        padding: 0px;
+        text-align: center;
+        font-family: sans-serif;
+      }
+      video {
+        width: 90%;
+        max-width: 800px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      }
+      
+    </style>
+  </head>
+  <body>
+    <header class="navbar">
+      <a class="logo" href="home.php">
+        <img src="logo.png" alt="LEMS Logo" />
+        <span>LEMS</span>
+      </a>
+      <nav class="nav-links">
+        <a href="browse.php">Browse Events</a>
+        <a href="recommended.php">Recommended</a>
+        <div class="profile-dropdown">
+          <img
+            src="https://img.icons8.com/ios-filled/24/ffffff/user.png"
+            alt="User Icon"
+            class="profile-icon"
+            onclick="toggleDropdown()"
+          />
+          <div id="dropdown-menu" class="dropdown-menu">
+            <a href="profile.html" class="dropdown-item">Profile</a>
+            <a href="index.html" class="dropdown-item" style="color: red"
+              >Log Out</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+    <h1>Live Stream</h1>
+    <video id="video" controls autoplay muted playsinline></video>
+
+    <script>
+      const video = document.getElementById("video");
+      const streamURL = "http://localhost:8080/hls/test.m3u8";
+
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(streamURL);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+          video.play();
+        });
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = streamURL;
+        video.addEventListener("loadedmetadata", function () {
+          video.play();
+        });
+      } else {
+        alert("Your browser does not support HLS playback.");
+      }
+    </script>
+  </body>
+</html>

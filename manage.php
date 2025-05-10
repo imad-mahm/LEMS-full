@@ -96,6 +96,11 @@ function switchTab(tab) {
             <p><strong>Date:</strong> <?php echo date('Y-m-d', strtotime($event->startTime)); ?></p>
             <p><strong>Time:</strong> <?php echo date('H:i', strtotime($event->startTime)); ?></p>
             <a href="event.php?event=<?php echo $event->eventID; ?>" class="btn-view">View Event</a>
+            <?php
+            if (strtotime($event->startTime) < time() && strtotime($event->endTime) > time()) {
+              echo '<a href="livestream.html?event=' . htmlspecialchars($event->eventID) . '" class="btn-view">Watch Livestream</a>';
+            }
+            ?>
           </div>
         </div>
       <?php endforeach; ?>

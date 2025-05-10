@@ -225,9 +225,9 @@ class EventManager {
 			$query .= "WHERE STATE = ?";
 		}
 		if ($time == "past") {
-			$query .= " AND START_TIME < current_timestamp()";
+			$query .= " AND END_TIME < current_timestamp()";
 		} else if ($time == "future") {
-			$query .= " AND START_TIME > current_timestamp()";
+			$query .= " AND END_TIME > current_timestamp()";
 		}
 
 		// Add club filter if provided
