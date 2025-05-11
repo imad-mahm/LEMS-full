@@ -72,8 +72,18 @@ $events = $eventsmanager->events;
             <?php foreach ($events as $event): ?>
                 <div class="event-card">
                     <div class="event-image">
-                        <?php if (!empty($event->createdBy)): ?><span class="category-tag"><?php echo htmlspecialchars($event->createdBy[0]); ?></span><?php endif; ?>
-                        <img src="<?php echo htmlspecialchars($event->imageURL); ?>" alt="<?php echo htmlspecialchars($event->eventID); ?> image">
+                      <?php if (!empty($event->createdBy)): ?><span class="category-tag">
+                        <?php 
+                          $stmtClub = $conn->prepare("SELECT CLUB_NAME FROM club WHERE ID = ?");
+                          $stmtClub->bind_param("i", $event->createdBy[0]);
+                          $stmtClub->execute();
+                          $clubResult = $stmtClub->get_result();
+                          $club = $clubResult->fetch_assoc();
+                          $stmtClub->close();
+                          echo htmlspecialchars($club['CLUB_NAME']);
+                        ?>
+                      </span><?php endif; ?>
+                      <img src="<?php echo htmlspecialchars($event->imageURL); ?>" alt="<?php echo htmlspecialchars($event->eventID); ?> image">
                     </div>
                     <h2><?php echo htmlspecialchars($event->title); ?></h2>
                     <p><strong>Date:</strong> <?php echo htmlspecialchars($event->startTime); ?></p>

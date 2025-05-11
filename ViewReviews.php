@@ -11,8 +11,29 @@ if ($_SESSION['user']['role'] != 'admin' && $_SESSION['user']['role'] != 'organi
 include "db_connection.php";
 require_once "classes.php";
 
-$eventID = $_GET['event'];
+$eventId = isset($_GET['event']) ? intval($_GET['event']) : 0;
+if ($eventId <= 0) {
+    echo "Invalid event.";
+    exit();
+}
 
+$event = new Event();
+$event->getDetails($eventId);
+
+if (!$event) {
+    echo "Event not found.";
+    exit();
+}
+
+// Fetch feedback using FeedbackManager
+$feedbackManager = new FeedbackManager();
+$reviews = $feedbackManager->getFeedbackFor($eventId);
+
+// Get AI summary if there are reviews
+$aiSummary = "";
+if (count($reviews) > 0) {
+    $aiSummary = $feedbackManager->summarizeReviews($reviews);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,6 +45,133 @@ $eventID = $_GET['event'];
     <link rel="stylesheet" href="home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="feedback.css">
+    <style>
+        /* Event Reviews Page Styles - Matching Site Theme */
+        /* Container */
+        .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        }
+
+        /* Section Headings */
+        .container > h1,
+        .reviews-section h2 {
+        text-align: center;
+        font-size: 2rem;
+        color: #047857;
+        margin-bottom: 1.5rem;
+        }
+
+        /* Event Details Card */
+        .event-details {
+        background-color: #ffffff;
+        border-radius: 0.5rem;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        }
+        .event-details h2 {
+        margin-top: 0;
+        font-size: 1.75rem;
+        color: #065f46;
+        }
+        .event-details p {
+        margin: 0.75rem 0;
+        line-height: 1.6;
+        color: #1f2937;
+        }
+        .event-details p strong {
+        color: #065f46;
+        }
+
+        /* Reviews Section */
+        .reviews-section {
+        padding-bottom: 2rem;
+        }
+
+        /* Individual Review Cards */
+        .reviews-section .review {
+        background-color: #ffffff;
+        border-left: 4px solid #047857;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+        .reviews-section .review p {
+        margin: 0.5rem 0;
+        color: #1f2937;
+        }
+        .reviews-section .review p strong {
+        color: #065f46;
+        }
+
+        /* Rating Badge */
+        .reviews-section .review .rating {
+        display: inline-block;
+        background-color: #047857;
+        color: #ffffff;
+        border-radius: 0.375rem;
+        padding: 0 0.5rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+        }
+
+        /* Timestamp */
+        .reviews-section .review .timestamp {
+        display: block;
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+        .container { padding: 1rem; }
+        .event-details, .reviews-section .review { padding: 1rem; }
+        .container > h1,
+        .reviews-section h2 {
+            font-size: 1.5rem;
+        }
+        .event-details h2 {
+            font-size: 1.5rem;
+        }
+        }
+        /* AI Summary Section */
+        .ai-summary-section {
+        background-color: #ecfdf5;
+        border-left: 4px solid #047857;
+        border-radius: 0.5rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .ai-summary-title {
+        margin: 0 0 1rem;
+        font-size: 1.75rem;
+        color: #047857;
+        }
+
+        .ai-summary-section p {
+        margin: 0;
+        line-height: 1.6;
+        color: #1f2937;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+        .ai-summary-section {
+            padding: 1rem;
+        }
+        .ai-summary-title {
+            font-size: 1.5rem;
+        }
+        }
+
+
+    </style>
 </head>
 <body>
 <header class="navbar">
@@ -69,13 +217,19 @@ $eventID = $_GET['event'];
 	<div class="event-details">
 		<?php
 		$event = new Event();
-		$event->getDetails($eventID);
+		$event->getDetails($eventId);
 		?>
 		<h2><?php echo $event->title; ?></h2>
 		<p><strong>Date:</strong> <?php echo $event->startTime; ?></p>
 		<p><strong>Location:</strong> <?php echo $event->location; ?></p>
 		<p><strong>Description:</strong> <?php echo $event->description; ?></p>
 	</div>
+    <?php if (count($reviews) > 0): ?>
+  <div class="ai-summary-section">
+    <h2 class="ai-summary-title">AI Summary of Reviews</h2>
+    <p><?php echo nl2br(htmlspecialchars($aiSummary)); ?></p>
+  </div>
+  <?php endif; ?>
 	<div class="reviews-section">
 		<h2>User Reviews</h2>
 		<?php
