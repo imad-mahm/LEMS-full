@@ -618,29 +618,4 @@ class Notification {
 	}
 }
 
-class Partner {
-	public $partnerID;
-	public $name;
-	public $description;
-	public $logoURL;
-	public $email;
-	public $eventID;
-	public function collabOnEvent($event) {
-
-	}
-}
-
-class LiveStream {
-	public $streamID;
-	public $event;
-	public $url;
-	public $viewerCount;
-	public function startStream() {
-
-	}
-	public function stopStream() {
-
-	}
-}
-
 ?>
