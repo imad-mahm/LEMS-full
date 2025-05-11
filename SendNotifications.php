@@ -162,17 +162,7 @@ p {
 		</div>
 	  </nav>
 	</header>
-	<div class="sidebar">
-		<h2>Send Notification</h2>
-		<ul>
-			<li><a href="CreateEvent.php">Create Event</a></li>
-			<li><a href="ViewEvents.php">View Upcoming Events</a></li>
-			<li><a href="ViewFeedback.php">View Feedback</a></li>
-			<li><a href="ManageClub.php">Manage Club</a></li>
-			<li><a href="SendNotifications.php">Send Notifications</a></li>
-		</ul>
-	</div>
-
+	<br>
 	<div class="content">
 		<form method="POST" action="SendNotifications.php">
 			<?php

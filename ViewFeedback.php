@@ -25,6 +25,7 @@ $events = $eventsmanager->events;
     <link rel="stylesheet" href="home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="feedback.css">
+    <style>main{padding:20px}</style>
 </head>
 <body>
 <header class="navbar">
