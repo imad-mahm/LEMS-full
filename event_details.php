@@ -126,6 +126,32 @@ if (count($reviews) > 0) {
       <p>No reviews yet.</p>
     <?php endif; ?>
   </div>
+
+  <div class="submit-review-section">
+    <h1 class="section-title">Leave a Review</h1>
+    <form action="submit_review.php" method="POST">
+      <input type="hidden" name="event_id" value="<?php echo htmlspecialchars($eventId); ?>">
+      <label for="rating">Rating (1-5):</label>
+      <select name="rating" id="rating" required>
+        <option value="">Select</option>
+        <option value="0.5">0.5</option>
+        <option value="1">1</option>
+        <option value="1.5">1.5</option>
+        <option value="2">2</option>
+        <option value="2.5">2.5</option>
+        <option value="3">3</option>
+        <option value="3.5">3.5</option>
+        <option value="4">4</option>
+        <option value="4.5">4.5</option>
+        <option value="5">5</option>
+      </select>
+      <br>
+      <label for="comment">Comment:</label>
+      <textarea name="comment" id="comment" rows="4" placeholder="Write your review here..." required></textarea>
+
+      <button type="submit" class="btn-submit">Submit Review</button>
+    </form>
+  </div>
 </main>
 
 <footer class="footer">

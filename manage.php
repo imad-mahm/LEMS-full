@@ -124,7 +124,7 @@ function switchTab(tab) {
             <h3><?php echo htmlspecialchars($event->title); ?></h3>
             <p><strong>Date:</strong> <?php echo date('Y-m-d', strtotime($event->startTime)); ?></p>
             <p><strong>Time:</strong> <?php echo date('H:i', strtotime($event->startTime)); ?></p>
-            <a href="event.php?event=<?php echo $event->eventID; ?>" class="btn-view">View Event</a>
+            <a href="event_details.php?event=<?php echo $event->eventID; ?>" class="btn-view">View Event</a>
           </div>
         </div>
       <?php endforeach; ?>

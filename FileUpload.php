@@ -3,7 +3,7 @@ require 'vendor/autoload.php';
 include "db_connection.php";
 require_once "classes.php";
 session_start();
-$dotenv = Dotenv\Dotenv::createImmutable(_DIR_);
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 $OPENAI_API_KEY = $_ENV['OPENAI_API_KEY'];

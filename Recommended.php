@@ -79,7 +79,7 @@ if (!empty($events) && !empty($userPreferences)) {
             <div class="profile-dropdown">
                 <img src="https://img.icons8.com/ios-filled/24/ffffff/user.png" alt="User Icon" class="profile-icon" onclick="toggleDropdown()" />
                 <div id="dropdown-menu" class="dropdown-menu">
-                    <a href="profile.html" class="dropdown-item">Profile</a>
+                    <a href="profile.php" class="dropdown-item">Profile</a>
                     <a href="index.html" class="dropdown-item" style="color:red;">Log Out</a>
                 </div>
             </div>
