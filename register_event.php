@@ -19,12 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $event_id = intval($_POST['event_id']);
     $action = $_POST['action']; // either 'register' or 'cancel'
 
-    if (!isset($_SESSION['user']['mail'])) {
+    if (!isset($_SESSION['user']['email'])) {
         echo 'no_session';
         exit;
     }
 
-    $lau_email = $_SESSION['user']['mail'];
+    $lau_email = $_SESSION['user']['email'];
     $timestamp = date('Y-m-d H:i:s');
 
     if ($action === 'register') {
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_ticket_nb = $current_count + 1;
 
         // Insert registration
-        $insert_stmt = $conn->prepare("INSERT INTO registration (LAU_EMAIL, EVENTID, TICKET_NB, TIME_STAMP) VALUES (?, ?, ?, ?)");
+        $insert_stmt = $conn->prepare("INSERT INTO registration (LAU_EMAIL, EVENTID, TICKET_NB, BOOKED_AT) VALUES (?, ?, ?, ?)");
         $insert_stmt->bind_param("siis", $lau_email, $event_id, $new_ticket_nb, $timestamp);
 
         if ($insert_stmt->execute()) {

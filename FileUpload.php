@@ -3,7 +3,7 @@ require 'vendor/autoload.php';
 include "db_connection.php";
 require_once "classes.php";
 session_start();
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv = Dotenv\Dotenv::createImmutable(_DIR_);
 $dotenv->load();
 
 $OPENAI_API_KEY = $_ENV['OPENAI_API_KEY'];
@@ -189,10 +189,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($msg['content'] as $part) {
                 $prefs = explode(', ', $part['text']['value']);
                 $user->updatePrefs($prefs);
+                $_SESSION['user']['preferences'] = $prefs;
             }
             break;
         }
     }
+    header("Location: Recommended.php");
     exit;
 }
 ?>

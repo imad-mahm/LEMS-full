@@ -135,7 +135,7 @@ function toggleFilterPopup() {
 <main>
 <section class="events-section">
 <div class="section-header">
-  <h2><span class="calendar-icon">📅</span> Upcoming Events</h2>
+  <h2 style="margin-right:10px"><span class="calendar-icon" >📅</span> Upcoming Events</h2>
   <div class="search-tools">
     <form method="GET" action="browse.php" style="width: 100%; display: flex; align-items: center;">
       <input type="text" name="search" placeholder="Search events by title or club..." value="<?php echo htmlspecialchars($search); ?>">
@@ -223,8 +223,8 @@ function toggleFilterPopup() {
         <p class="spots-filled"><?php echo $filled; ?> / <?php echo $total; ?> spots filled</p>
         <?php
         $alreadyRegistered = false;
-        if (isset($_SESSION['user']['mail'])) {
-          $lau_email = $_SESSION['user']['mail'];
+        if (isset($_SESSION['user']['email'])) {
+          $lau_email = $_SESSION['user']['email'];
           $check_stmt = $conn->prepare("SELECT 1 FROM registration WHERE LAU_EMAIL = ? AND EVENTID = ?");
           $check_stmt->bind_param("si", $lau_email, $event['EVENTID']);
           $check_stmt->execute();

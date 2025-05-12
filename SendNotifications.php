@@ -10,7 +10,7 @@ if (isset($_SESSION['user'])) {
 	exit();
 }
 include 'db_connection.php';
-include 'classes.php';
+require_once 'classes.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

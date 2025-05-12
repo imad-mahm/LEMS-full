@@ -9,16 +9,20 @@ if (!isset($_SESSION['user'])) {
 
 // Load environment and OpenAI client
 require 'vendor/autoload.php';
+require_once "classes.php";
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 $client = OpenAI::client($_ENV['OPENAI_API_KEY']);
 
 // Retrieve user preferences
-$userPreferences = $_SESSION['user']['preferences'] ?? [];
+$user = new User();
+$user->getUserInfo($_SESSION['user']['email']);
+$user->getUserPreferences();
+$userPreferences = $user->pref;
 
 // Fetch all events
-require_once 'db_connection.php';
-include "classes.php";
+require_once "classes.php";
+include "db_connection.php";
 $eventManager = new EventManager();
 $eventManager->getAllEvents();
 $events = $eventManager->events;
@@ -36,7 +40,7 @@ if (!empty($events) && !empty($userPreferences)) {
 
         try {
             $response = $client->chat()->create([
-                'model' => 'gpt-4o',
+                'model' => 'gpt-4',
                 'messages' => [
                     ['role' => 'system', 'content' => 'You are a helpful assistant that rates events.'],
                     ['role' => 'user', 'content' => $prompt]
@@ -114,7 +118,7 @@ if (!empty($events) && !empty($userPreferences)) {
                         <span class="icon">📍</span>
                         <?php
                         $locationId = $event->location;
-                        $stmtLocation = $conn->prepare("SELECT * FROM `location` WHERE LOCATIONID = ?");
+                        $stmtLocation = $conn->prepare("SELECT * FROM location WHERE LOCATIONID = ?");
                         $stmtLocation->bind_param("i", $locationId);
                         $stmtLocation->execute();
                         $locationResult = $stmtLocation->get_result();
